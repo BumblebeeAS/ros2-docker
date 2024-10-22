@@ -1,3 +1,4 @@
+---
 project_name: drone
 session_name: drone
 root: /
@@ -56,8 +57,4 @@ windows:
         - empty:
           - ls
 
-
-
-
-
-
+tmux_command: sleep 1 && tmux
