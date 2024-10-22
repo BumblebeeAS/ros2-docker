@@ -37,10 +37,15 @@ windows:
           - cd /workspaces/drone/
           - udp4-dds-config
           - ros2 launch uav2_state_machine launch.py
-        - flir-camera:
+        - filters:
           - cd /workspaces/drone/
           - udp4-dds-config
-          - ros2 launch software_uav_2 launch.py
+          - ros2 launch bb_filters uav2_filters.launch.py
+        - ml:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch ml_detector ml_detector.launch.py ns:=uav2 initial_config:=canvas_detections config:=uav2.yaml
+
   - camera:
       layout: tiled
       panes:
@@ -52,6 +57,10 @@ windows:
           - cd /workspaces/isaac_ros-dev
           - udp4-dds-config
           - ros2 launch aruco_loco main.launch.py 
+        - flir-camera:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch software_uav_2 launch.py
         - empty:
           - ls
         - empty:
