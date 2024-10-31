@@ -23,8 +23,6 @@ COPY scripts/rosdep-all.sh $SCRIPTS_DIR
 # Entrypoint scripts
 COPY scripts/drone-docker-dev-entrypoint.sh $SCRIPTS_DIR
 COPY scripts/drone-docker-main-entrypoint.sh $SCRIPTS_DIR
-# tmux and tmuxinator configs
-COPY config/.tmux.conf /etc/tmux.conf
 # Bash read command
 COPY scripts/drone.bashrc $SCRIPTS_DIR
 # Bash aliases
