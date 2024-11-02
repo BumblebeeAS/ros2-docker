@@ -272,8 +272,8 @@ docker run -it --rm \
     ${DOCKER_ARGS[@]} \
     -v $ISAAC_ROS_DEV_DIR:/workspaces/isaac_ros-dev \
     -v $HOME/workspaces/drone:/workspaces/drone \
-    -v $HOME/workspaces/zed:/workspaces/zed \
     -v $HOME/workspaces/ros2-docker/isaac_ros_jp6.0/config/tmuxinator:/workspaces/config/tmuxinator \
+    -v $HOME/workspaces/ros2-docker/isaac_ros_jp6.0/config/.tmux.conf:/etc/tmux.conf \
     -v /etc/localtime:/etc/localtime:ro \
     -v /dev/:/dev/ \
     -v $HOME/.cache/ccache:/home/admin/.cache/ccache \

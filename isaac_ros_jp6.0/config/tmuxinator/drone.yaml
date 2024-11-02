@@ -1,13 +1,13 @@
-project_name: drone
-session_name: drone
+---
+name: drone
 root: /
-suppress_history: false
+
 windows:
   - jellyfish:
       layout: tiled
       panes:
         - px4-agent:
-          - MicroXRCEAgent udp4 -p 8888
+          - if [[ -t 0 ]]; then MicroXRCEAgent udp4 -p 8888; fi
         - offboard-heartbeat:
           - cd /workspaces/drone/
           - udp4-dds-config
@@ -19,14 +19,86 @@ windows:
         - localization:
           - cd /workspaces/drone/
           - udp4-dds-config
-          - ros2 launch bb_localization uav2_robot_localisation.launch.py
+          - ros2 launch bb_localization uav2_robot_localisation.launch.py  
         - frames:
           - cd /workspaces/drone/
           - udp4-dds-config
           - ros2 launch frames launch.py
-        - mp-server:
+        - state-machine:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch uav2_state_machine launch.py
+        - filters:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch bb_filters uav2_filters.launch.py
+        - ml:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch ml_detector ml_detector.launch.py ns:=uav2 initial_config:=canvas_detections config:=uav2.yaml
+        - workspace:
+          - cd /workspaces/drone/
+          - echo "free space here"
+
+  - trees:
+      layout: tiled
+      panes:
+        - bt-server:
           - cd /workspaces/drone/
           - udp4-dds-config
           - ros2 launch behavior_tree mission_planner.launch.py config:=example.yaml action_name:=my_engine groot2_port:=1667 ns:=aaa
-        - editor4:
-          - echo "Waiting..."
+        - tree-workspace:
+          - cd /workspaces/drone
+          - echo "run trees here"
+
+  - camera:
+      layout: tiled
+      panes:
+        - imx-cameras:
+          - cd /workspaces/isaac_ros-dev
+          - udp4-dds-config
+          - ros2 launch isaac_ros_main camera_main.launch.py
+        - aruco-detections:
+          - cd /workspaces/isaac_ros-dev
+          - udp4-dds-config
+          - ros2 launch aruco_loco main.launch.py
+        - flir-camera:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch software_uav_2 launch.py
+        - camera-workspace:
+          - cd /workspaces/drone/
+          - echo "free space here"
+
+  - radio:
+      layout: tiled
+      panes:
+        - radio-node:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch jellyfish2_radio launch.py
+        - search-report-node:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch robotx_2024 jellyfish_search_report_launch.py
+        - radio-workspace:
+          - cd /workspaces/drone/
+          - sleep 4
+          - tmux select-pane -t 1.1 -T px4-agent
+          - tmux select-pane -t 1.2 -T offboard-heartbeat
+          - tmux select-pane -t 1.3 -T px4-msg-converter
+          - tmux select-pane -t 1.4 -T localization
+          - tmux select-pane -t 1.5 -T frames
+          - tmux select-pane -t 1.6 -T state-machine
+          - tmux select-pane -t 1.7 -T filters
+          - tmux select-pane -t 1.8 -T ml
+          - tmux select-pane -t 1.9 -T workspace
+          - tmux select-pane -t 2.1 -T bt-server
+          - tmux select-pane -t 2.2 -T tree-workspace
+          - tmux select-pane -t 3.1 -T imx-cameras
+          - tmux select-pane -t 3.2 -T aruco-detections
+          - tmux select-pane -t 3.3 -T flir-camera
+          - tmux select-pane -t 3.4 -T camera-workspace
+          - tmux select-pane -t 4.1 -T radio-node
+          - tmux select-pane -t 4.2 -T search-report-node
+          - tmux select-pane -t 4.3 -T radio-workspace

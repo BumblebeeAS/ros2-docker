@@ -1,0 +1,9 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND teletype
+ARG USERNAME=admin
+RUN ACCEPT_EULA=y
+COPY spinnaker-4.0.0.116-arm64 /spinnaker-4.0.0.116-arm64 
+WORKDIR /spinnaker-4.0.0.116-arm64
+RUN yes | ./install_spinnaker_arm.sh

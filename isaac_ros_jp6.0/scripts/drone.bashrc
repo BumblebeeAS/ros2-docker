@@ -1,12 +1,8 @@
 # Source all ROS workspaces
-if [ -d /workspaces/zed ]; then 
-    source /workspaces/zed/install/local_setup.bash
-fi
-
-if [ -d /workspaces/isaac_ros-dev ]; then 
+if [ -d /workspaces/isaac_ros-dev/install ]; then 
     source /workspaces/isaac_ros-dev/install/setup.bash
 fi
 
-if [ -d /workspaces/drone ]; then 
+if [ -d /workspaces/drone/install ]; then 
     source /workspaces/drone/install/setup.bash
 fi
