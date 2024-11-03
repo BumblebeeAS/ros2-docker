@@ -35,7 +35,7 @@ windows:
         - ml:
           - cd /workspaces/drone/
           - udp4-dds-config
-          - ros2 launch ml_detector ml_detector.launch.py ns:=uav2 initial_config:=canvas_detections config:=uav2.yaml
+          - ros2 launch ml_detector ml_detector.launch.py ns:=uav2 initial_config:=old_canvas_detections config:=uav2.yaml
         - workspace:
           - cd /workspaces/drone/
           - echo "free space here"
