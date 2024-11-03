@@ -6,3 +6,4 @@ fi
 if [ -d /workspaces/drone/install ]; then 
     source /workspaces/drone/install/setup.bash
 fi
+export ROS_DOMAIN_ID=38
