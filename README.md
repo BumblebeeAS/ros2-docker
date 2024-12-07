@@ -317,3 +317,9 @@ To fix these errors, do the following:
 Thereafter, the camera stream can be started within the container without errors.
 
 This fix seems to not persist between boots. If needed, repeat the process to fix the issue after boot.
+
+### 6. Permission issues with FLIR
+Unable to obtain any FLIR camera feed or use FLIR spinnaker interface. Need to make sure the udev rules are correct (can be checked by `lsusb` to check the vendor id etc.). We noticed there were permission issues even after the udev rule fix, a temporary fix was to run `chmod 777 /dev/bus -R` to connect to camera.
+
+### 7. OpenCv versions
+Clashes between ml dependencies and the dependencies for aruco-loco. Temporary fix was to pip uninstall all open cv dependencies and then install the specific opencv version (opencv-contrib-python 4.10.0.84)
