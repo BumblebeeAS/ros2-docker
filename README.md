@@ -147,8 +147,10 @@ For SBC, use `isaac_ros_jp6.0`. For local computer, use `isaac_ros_x64`.
 
 ```
 cd ${ISAAC_ROS_WS}/src && \
-   git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git
+   git clone -b release-3.2 https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git isaac_ros_common
 ```
+
+Correct as of 28 Dec 2024. Replace `release-3.2` with the latest stable release.
 
 2. Edit the Isaac ROS Common config file by setting `CONFIG_DOCKER_SEARCH_DIRS` as 
 
