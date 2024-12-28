@@ -4,6 +4,7 @@
       - [Install Jetpack](#install-jetpack)
       - [Install docker](#install-docker)
       - [Add docker to user group](#add-docker-to-user-group)
+    - [Jetson Setup for VPI](#jetson-setup-for-vpi)
     - [Setup Isaac ROS](#setup-isaac-ros)
     - [Jetson Clocks (Optional)](#jetson-clocks-optional)
     - [Add Authorized SSH Keys (Optional)](#add-authorized-ssh-keys-optional)
@@ -68,6 +69,22 @@ newgrp docker
 ```
 
 Reboot the computer for the changes to take effect.
+
+### Jetson Setup for VPI
+
+Source: https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/jetson_vpi.html
+
+```
+sudo nvidia-ctk cdi generate --mode=csv --output=/etc/cdi/nvidia.yaml
+
+# Add Jetson public APT repository
+sudo apt-get update
+sudo apt-get install software-properties-common
+sudo apt-key adv --fetch-key https://repo.download.nvidia.com/jetson/jetson-ota-public.asc
+sudo add-apt-repository 'deb https://repo.download.nvidia.com/jetson/common r36.4 main'
+sudo apt-get update
+sudo apt-get install -y pva-allow-2
+```
 
 ### Setup Isaac ROS
 
