@@ -1,0 +1,7 @@
+# Fixes "Mismatch version jtop service: [4.3.0] and client: [4.2.12]" where jtop version outside container is larger
+
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+RUN python3 -m pip install -U \
+  jetson-stats
