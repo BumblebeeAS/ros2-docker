@@ -25,7 +25,7 @@
 
 # Installation
 
-*For ease of installation, save this directory as `~/workspaces/ros2-docker`.*
+_For ease of installation, save this directory as `~/workspaces/ros2-docker`._
 
 ## Installation on SBC
 
@@ -141,7 +141,7 @@ To avoid keying in the password each time login in via SSH, add the client compu
 This is for decoding images compressed on the Jetson.
 
 Follow https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/index.html
-and https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html to set up 
+and https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html to set up
 Isaac ROS docker dev environment.
 
 # Setup Workspaces
@@ -169,7 +169,7 @@ cd ${ISAAC_ROS_WS}/src && \
 
 Correct as of 28 Dec 2024. Replace `release-3.2` with the latest stable release.
 
-2. Edit the Isaac ROS Common config file by setting `CONFIG_DOCKER_SEARCH_DIRS` as 
+2. Edit the Isaac ROS Common config file by setting `CONFIG_DOCKER_SEARCH_DIRS` as
 
 For `isaac_ros_jp6.0`:
 
@@ -195,7 +195,7 @@ For `isaac_ros_jp6.0`:
 
 ```
 export SOURCE_DIRECTORY=$HOME/workspaces/ros2-docker/isaac_ros_jp6.0
-ln -sf $SOURCE_DIRECTORY/.isaac_ros_common-config   ~/.isaac_ros_common-config 
+ln -sf $SOURCE_DIRECTORY/.isaac_ros_common-config   ~/.isaac_ros_common-config
 ln -sf $SOURCE_DIRECTORY/run_dev.sh                 ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/run_dev.sh
 ln -sf $SOURCE_DIRECTORY/run_main.sh                ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/run_main.sh
 unset SOURCE_DIRECTORY
@@ -205,7 +205,7 @@ For `isaac_ros_x64`:
 
 ```
 export SOURCE_DIRECTORY=$HOME/workspaces/ros2-docker/isaac_ros_x64
-ln -sf $SOURCE_DIRECTORY/.isaac_ros_common-config   ~/.isaac_ros_common-config 
+ln -sf $SOURCE_DIRECTORY/.isaac_ros_common-config   ~/.isaac_ros_common-config
 ln -sf $SOURCE_DIRECTORY/run_dev.sh                 ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/run_dev.sh
 ln -sf $SOURCE_DIRECTORY/run_main.sh                ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/run_main.sh
 unset SOURCE_DIRECTORY
@@ -220,7 +220,7 @@ cd ${ISAAC_ROS_WS}/src/isaac_ros_common
 
 # Start Docker Container
 
-`run_dev.sh` is for development, while `run_main.sh` is for production. 
+`run_dev.sh` is for development, while `run_main.sh` is for production.
 The difference is that `run_dev.sh` attempts a Docker image build each time, while
 `run_main.sh` looks up an existing Docker image.
 
@@ -239,8 +239,8 @@ By default, file changes (except in the mounted workspaces) and installations in
 are not persistent. To save the current state of the container's filesystem to an image, do `docker container commit`
 (https://docs.docker.com/reference/cli/docker/container/commit/).
 
-`run_main.sh` requires the environment variable `BUILT_DOCKER_CONTAINER_NAME`. 
-It reads environment variables from `ENV_FILE`, which by default is `$HOME/workspaces/ros2-docker/environments/.env`. 
+`run_main.sh` requires the environment variable `BUILT_DOCKER_CONTAINER_NAME`.
+It reads environment variables from `ENV_FILE`, which by default is `$HOME/workspaces/ros2-docker/environments/.env`.
 If the path of your file is different, change `ENV_FILE` in `run_main.sh`.
 
 # Notes
@@ -281,7 +281,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && cd ../ && apt-get install -y ./*.deb && rm ./*.deb
 ```
 
-and 
+and
 
 ```
 # Install moveit2_tutorials from source (depends on moveit_hybrid_planning).
@@ -300,7 +300,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 ### 3. Sourcing of ROS Workspaces on Entry
 
-- Only the first terminal instance running the Docker container source the ROS workspaces automatically. Subsequent instances do not. 
+- Only the first terminal instance running the Docker container source the ROS workspaces automatically. Subsequent instances do not.
 
 ### 4. Jetson Clocks
 
