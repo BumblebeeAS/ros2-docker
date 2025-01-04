@@ -292,4 +292,5 @@ docker run -it --rm \
     --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh \
     --workdir /workspaces/isaac_ros-dev \
     $BASE_NAME \
-    /bin/bash
+    /bin/bash \
+    -l # login shell, sources /etc/profile.d, but results in "jtop.core.jetson_variables" warning.

@@ -20,3 +20,9 @@ RUN echo "libgentl libspinnaker/accepted-flir-eula boolean true" | debconf-set-s
 
 # When running the install script, send a stream of empty strings, which effectively simulates pressing Enter repeatedly.
 RUN yes "" | ./install_spinnaker_arm.sh
+
+# Running with Xephyr fixes flickering issue when running SpinView
+RUN --mount=type=cache,target=/var/cache/apt \
+  apt-get update -y || true && \
+  apt-get install -y \
+  xserver-xephyr
