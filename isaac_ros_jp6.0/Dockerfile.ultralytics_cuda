@@ -1,0 +1,12 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+RUN python3 -m pip install -U boxmot  \
+    ultralytics \
+    patched_yolo_infer 
+
+RUN apt-get install libopenmpi-dev libopenblas-base libomp-dev -y 
+RUN python3 -m pip install https://github.com/ultralytics/assets/releases/download/v0.0.0/torch-2.3.0-cp310-cp310-linux_aarch64.whl \
+    https://github.com/ultralytics/assets/releases/download/v0.0.0/torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl
+    
+RUN wget https://nvidia.box.com/shared/static/48dtuob7meiw6ebgfsfqakc9vse62sg4.whl -O onnxruntime_gpu-1.18.0-cp310-cp310-linux_aarch64.whl 
+RUN python3 -m pip install onnxruntime_gpu-1.18.0-cp310-cp310-linux_aarch64.whl 

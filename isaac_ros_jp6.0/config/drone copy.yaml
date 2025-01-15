@@ -1,0 +1,69 @@
+---
+project_name: drone
+session_name: drone
+root: /
+suppress_history: false
+windows:
+  - jellyfish:
+      layout: tiled
+      panes:
+        - px4-agent:
+          - MicroXRCEAgent udp4 -p 8888
+        - offboard-heartbeat:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch jellyfish2_offboard launch.py
+        - px4-msg-converter:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch px4_msg_converter launch.py
+        - localization:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch bb_localization uav2_robot_localisation.launch.py  
+        - frames:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch frames launch.py
+        - mp-server:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch behavior_tree mission_planner.launch.py config:=example.yaml action_name:=my_engine groot2_port:=1667 ns:=aaa
+        - radio:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch jellyfish2_radio launch.py
+        - state-machine:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch uav2_state_machine launch.py
+        - filters:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch bb_filters uav2_filters.launch.py
+        - ml:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch ml_detector ml_detector.launch.py ns:=uav2 initial_config:=canvas_detections config:=uav2.yaml
+
+  - camera:
+      layout: tiled
+      panes:
+        - imx_cameras:
+          - cd /workspaces/isaac_ros-dev
+          - udp4-dds-config
+          - ros2 launch isaac_ros_main camera_main.launch.py
+        - aruco_detections:
+          - cd /workspaces/isaac_ros-dev
+          - udp4-dds-config
+          - ros2 launch aruco_loco main.launch.py 
+        - flir-camera:
+          - cd /workspaces/drone/
+          - udp4-dds-config
+          - ros2 launch software_uav_2 launch.py
+        - empty:
+          - ls
+        - empty:
+          - ls
+
+tmux_command: sleep 1 && tmux
