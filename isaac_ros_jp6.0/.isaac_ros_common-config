@@ -1,3 +1,3 @@
-CONFIG_IMAGE_KEY=ros2_humble.isaac_ros_vision.micro_xrce_dds_agent.zed_for_isaac_ros.husarnet.drone.aruco_loco.user.spinnaker.ultralytics_cuda
+CONFIG_IMAGE_KEY=ros2_humble.spinnaker.jtop.auv
 
 CONFIG_DOCKER_SEARCH_DIRS=($HOME/workspaces/ros2-docker/isaac_ros_jp6.0)

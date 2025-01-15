@@ -1,9 +1,36 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
-ENV DEBIAN_FRONTEND noninteractive
-ENV DEBIAN_FRONTEND teletype
-ARG USERNAME=admin
-RUN ACCEPT_EULA=y
-COPY spinnaker-4.0.0.116-arm64 /spinnaker-4.0.0.116-arm64 
-WORKDIR /spinnaker-4.0.0.116-arm64
-RUN yes | ./install_spinnaker_arm.sh
+
+RUN --mount=type=cache,target=/var/cache/apt \
+  apt-get update -y || true && \
+  apt-get install -y \
+  libusb-1.0-0 \
+  qtbase5-dev \
+  qtchooser \
+  qt5-qmake \
+  qtbase5-dev-tools 
+
+# Download and install Spinnaker SDK
+# Change the URL to the latest version if needed
+RUN wget -qO- https://flir.netx.net/file/asset/68257/original/attachment/spinnaker-4.2.0.21-arm64-pkg.tar.gz | tar xvz
+
+WORKDIR /spinnaker-4.2.0.21-arm64
+
+# Skip the EULA agreement prompt, which cannot be bypassed by pressing Enter.
+RUN echo "libgentl libspinnaker/accepted-flir-eula boolean true" | debconf-set-selections
+
+# When running the install script, send a stream of empty strings, which effectively simulates pressing Enter repeatedly.
+RUN yes "" | ./install_spinnaker_arm.sh
+
+# Running with Xephyr fixes flickering issue when running SpinView
+RUN --mount=type=cache,target=/var/cache/apt \
+  apt-get update -y || true && \
+  apt-get install -y \
+  xserver-xephyr
+
+# Install ROS package for Spinnaker camera driver
+ARG ROS_DISTRO=humble
+RUN --mount=type=cache,target=/var/cache/apt \
+  apt-get update -y || true && \
+  apt-get install -y \
+  ros-${ROS_DISTRO}-spinnaker-camera-driver
