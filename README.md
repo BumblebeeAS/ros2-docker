@@ -1,9 +1,9 @@
 - [Installation](#installation)
   - [Installation on SBC](#installation-on-sbc)
-    - [Setup docker](#setup-docker)
+    - [Setup Docker](#setup-docker)
       - [Install Jetpack](#install-jetpack)
-      - [Install docker](#install-docker)
-      - [Add docker to user group](#add-docker-to-user-group)
+      - [Install Docker](#install-docker)
+      - [Add Docker to User Group](#add-docker-to-user-group)
     - [Jetson Setup for VPI](#jetson-setup-for-vpi)
     - [Setup Isaac ROS](#setup-isaac-ros)
     - [Jetson Clocks (Optional)](#jetson-clocks-optional)
@@ -22,6 +22,8 @@
     - [3. Sourcing of ROS Workspaces on Entry](#3-sourcing-of-ros-workspaces-on-entry)
     - [4. Jetson Clocks](#4-jetson-clocks)
     - [5. ZED](#5-zed)
+    - [6. Permission Issues with FLIR](#6-permission-issues-with-flir)
+    - [7. OpenCV Versions](#7-opencv-versions)
 
 # Installation
 
@@ -29,7 +31,7 @@ _For ease of installation, save this directory as `~/workspaces/ros2-docker`._
 
 ## Installation on SBC
 
-### Setup docker
+### Setup Docker
 
 Source: https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/index.html
 
@@ -41,7 +43,7 @@ Commands from the above website are pasted below:
 sudo apt install nvidia-jetpack
 ```
 
-#### Install docker
+#### Install Docker
 
 ```
 # Add Docker's official GPG key:
@@ -61,7 +63,7 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-#### Add docker to user group
+#### Add Docker to User Group
 
 ```
 sudo usermod -aG docker $USER
@@ -337,9 +339,9 @@ Thereafter, the camera stream can be started within the container without errors
 
 This fix seems to not persist between boots. If needed, repeat the process to fix the issue after boot.
 
-### 6. Permission issues with FLIR
+### 6. Permission Issues with FLIR
 Unable to obtain any FLIR camera feed or use FLIR spinnaker interface. Need to make sure the udev rules are correct (can be checked by `lsusb` to check the vendor id etc.). We noticed there were permission issues even after the udev rule fix, a temporary fix was to run `chmod 777 /dev/bus -R` to connect to camera.
 
-### 7. OpenCv versions
+### 7. OpenCV Versions
 Clashes between ml dependencies and the dependencies for aruco-loco. Temporary fix was to pip uninstall all open cv dependencies and then install the specific opencv version (opencv-contrib-python 4.10.0.84)
 
