@@ -275,6 +275,14 @@ if [[ -f "${DOCKER_ARGS_FILEPATH}" ]]; then
     done
 fi
 
+# Add list of workspace directories to mount
+if [[ -f $HOME/workspaces/ros2-docker/environments/mount_dirs.sh ]]; then
+    source $HOME/workspaces/ros2-docker/environments/mount_dirs.sh
+    for MOUNT_DIR in "${MOUNT_DIRS[@]}"; do
+        DOCKER_ARGS+=("-v $MOUNT_DIR")
+    done
+fi
+
 # Run container from image
 print_info "Running $CONTAINER_NAME"
 if [[ $VERBOSE -eq 1 ]]; then
