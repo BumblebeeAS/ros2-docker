@@ -23,7 +23,6 @@
     - [4. Jetson Clocks](#4-jetson-clocks)
     - [5. ZED](#5-zed)
     - [6. Permission Issues with FLIR](#6-permission-issues-with-flir)
-    - [7. OpenCV Versions](#7-opencv-versions)
 
 # Installation
 
@@ -39,13 +38,13 @@ Commands from the above website are pasted below:
 
 #### Install Jetpack
 
-```
+```bash
 sudo apt install nvidia-jetpack
 ```
 
 #### Install Docker
 
-```
+```bash
 # Add Docker's official GPG key:
 sudo apt-get update
 sudo apt-get install ca-certificates curl
@@ -65,7 +64,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 
 #### Add Docker to User Group
 
-```
+```bash
 sudo usermod -aG docker $USER
 newgrp docker
 ```
@@ -76,7 +75,7 @@ Reboot the computer for the changes to take effect.
 
 Source: https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/jetson_vpi.html
 
-```
+```bash
 sudo nvidia-ctk cdi generate --mode=csv --output=/etc/cdi/nvidia.yaml
 
 # Add Jetson public APT repository
@@ -94,7 +93,7 @@ Source: https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html
 
 Commands from the above website are pasted below:
 
-```
+```bash
 sudo systemctl daemon-reload && sudo systemctl restart docker
 
 sudo apt-get install git-lfs
@@ -126,7 +125,7 @@ WantedBy=multi-user.target
 
 Then run the following commands
 
-```
+```bash
 sudo chmod 644 /etc/systemd/system/jetsonClocks.service
 sudo systemctl daemon-reload
 sudo systemctl enable jetsonClocks.service
@@ -164,7 +163,7 @@ For SBC, use `isaac_ros_jp6.0`. For local computer, use `isaac_ros_x64`.
 
 1. Clone `isaac_ros_common`.
 
-```
+```bash
 cd ${ISAAC_ROS_WS}/src && \
    git clone -b release-3.2 https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git isaac_ros_common
 ```
@@ -195,7 +194,7 @@ By default, the path to this directory is `$HOME/workspaces/ros2-docker`. Replac
 
 For `isaac_ros_jp6.0`:
 
-```
+```bash
 export SOURCE_DIRECTORY=$HOME/workspaces/ros2-docker/isaac_ros_jp6.0
 ln -sf $SOURCE_DIRECTORY/.isaac_ros_common-config   ~/.isaac_ros_common-config
 ln -sf $SOURCE_DIRECTORY/run_dev.sh                 ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/run_dev.sh
@@ -205,7 +204,7 @@ unset SOURCE_DIRECTORY
 
 For `isaac_ros_x64`:
 
-```
+```bash
 export SOURCE_DIRECTORY=$HOME/workspaces/ros2-docker/isaac_ros_x64
 ln -sf $SOURCE_DIRECTORY/.isaac_ros_common-config   ~/.isaac_ros_common-config
 ln -sf $SOURCE_DIRECTORY/run_dev.sh                 ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/run_dev.sh
@@ -215,20 +214,18 @@ unset SOURCE_DIRECTORY
 
 4. Build the docker images.
 
-```
+```bash
 cd ${ISAAC_ROS_WS}/src/isaac_ros_common
 ./scripts/run_dev.sh
 ```
 
 # Start Docker Container
 
-`run_dev.sh` is for development, while `run_main.sh` is for production.
-The difference is that `run_dev.sh` attempts a Docker image build each time, while
-`run_main.sh` looks up an existing Docker image.
+`run_dev.sh` is for development, while `run_main.sh` is for production. The difference is that `run_dev.sh` attempts a Docker image build each time, while `run_main.sh` looks up an existing Docker image.
 
 ## Development
 
-```
+```bash
 cd ${ISAAC_ROS_WS}/src/isaac_ros_common
 ./scripts/run_dev.sh
 ```
@@ -237,13 +234,9 @@ cd ${ISAAC_ROS_WS}/src/isaac_ros_common
 
 `run_main.sh` is meant to run a built image, which can be built by `run_dev.sh`.
 
-By default, file changes (except in the mounted workspaces) and installations in a running Docker container
-are not persistent. To save the current state of the container's filesystem to an image, do `docker container commit`
-(https://docs.docker.com/reference/cli/docker/container/commit/).
+By default, file changes (except in the mounted workspaces) and installations in a running Docker container are not persistent. To save the current state of the container's filesystem to an image, do `docker container commit` (https://docs.docker.com/reference/cli/docker/container/commit/).
 
-`run_main.sh` requires the environment variable `BUILT_DOCKER_CONTAINER_NAME`.
-It reads environment variables from `ENV_FILE`, which by default is `$HOME/workspaces/ros2-docker/environments/.env`.
-If the path of your file is different, change `ENV_FILE` in `run_main.sh`.
+`run_main.sh` requires the environment variable `BUILT_DOCKER_CONTAINER_NAME`. It reads environment variables from `ENV_FILE`, which by default is `$HOME/workspaces/ros2-docker/environments/.env`. If the path of your file is different, change `ENV_FILE` in `run_main.sh`.
 
 # Notes
 
@@ -258,10 +251,9 @@ If the path of your file is different, change `ENV_FILE` in `run_main.sh`.
 
 **UPDATE: As of 2 Aug 2024, this issue seems to be fixed.**
 
-**NOTE: As of 18 Jul 2024, there is a bug with `moveit_task_constructor`. Comment out the following lines in
-`~/workspaces/isaac_ros-dev/src/isaac_ros_common/docker/Dockerfile.ros2_humble`:**
+**NOTE: As of 18 Jul 2024, there is a bug with `moveit_task_constructor`. Comment out the following lines in `~/workspaces/isaac_ros-dev/src/isaac_ros_common/docker/Dockerfile.ros2_humble`:**
 
-```
+```bash
 # Install MoveIt task constructor from source.  The "demo" package depends on moveit_resources_panda_moveit_config,
 # installed from source above.
 
@@ -285,7 +277,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 and
 
-```
+```bash
 # Install moveit2_tutorials from source (depends on moveit_hybrid_planning).
 RUN --mount=type=cache,target=/var/cache/apt \
     mkdir -p ${ROS_ROOT}/src && cd ${ROS_ROOT}/src \
@@ -310,7 +302,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 - Even after setting Jetson Clocks to run on startup [above](#jetson-clocks-optional), it may randomly fail to start up due to a bug with `nvpmodel` (https://forums.developer.nvidia.com/t/segfault-in-usr-sbin-nvpmodel/295010/16). Simply do:
 
-```
+```bash
 sudo systemctl restart nvpmodel.service
 sudo systemctl restart jetsonClocks.service
 ```
@@ -321,7 +313,7 @@ Where the second line can be replaced with `sudo jetson_clocks` if the service i
 
 When starting camera stream for the ZED camera within the Docker container using the following command:
 
-```
+```bash
 ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zedm
 ```
 
@@ -340,8 +332,5 @@ Thereafter, the camera stream can be started within the container without errors
 This fix seems to not persist between boots. If needed, repeat the process to fix the issue after boot.
 
 ### 6. Permission Issues with FLIR
+
 Unable to obtain any FLIR camera feed or use FLIR spinnaker interface. Need to make sure the udev rules are correct (can be checked by `lsusb` to check the vendor id etc.). We noticed there were permission issues even after the udev rule fix, a temporary fix was to run `chmod 777 /dev/bus -R` to connect to camera.
-
-### 7. OpenCV Versions
-Clashes between ml dependencies and the dependencies for aruco-loco. Temporary fix was to pip uninstall all open cv dependencies and then install the specific opencv version (opencv-contrib-python 4.10.0.84)
-
