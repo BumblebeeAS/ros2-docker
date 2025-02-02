@@ -17,12 +17,11 @@
 - [Notes](#notes)
   - [TODO](#todo)
   - [Issues](#issues)
-    - [1. MoveIt](#1-moveit)
-    - [2. Husarnet](#2-husarnet)
-    - [3. Sourcing of ROS Workspaces on Entry](#3-sourcing-of-ros-workspaces-on-entry)
-    - [4. Jetson Clocks](#4-jetson-clocks)
-    - [5. ZED](#5-zed)
-    - [6. Permission Issues with FLIR](#6-permission-issues-with-flir)
+    - [1. Husarnet](#1-husarnet)
+    - [2. Sourcing of ROS Workspaces on Entry](#2-sourcing-of-ros-workspaces-on-entry)
+    - [3. Jetson Clocks](#3-jetson-clocks)
+    - [4. ZED](#4-zed)
+    - [5. Permission Issues with FLIR](#5-permission-issues-with-flir)
 
 # Installation
 
@@ -247,56 +246,16 @@ By default, file changes (except in the mounted workspaces) and installations in
 
 ## Issues
 
-### 1. MoveIt
-
-**UPDATE: As of 2 Aug 2024, this issue seems to be fixed.**
-
-**NOTE: As of 18 Jul 2024, there is a bug with `moveit_task_constructor`. Comment out the following lines in `~/workspaces/isaac_ros-dev/src/isaac_ros_common/docker/Dockerfile.ros2_humble`:**
-
-```bash
-# Install MoveIt task constructor from source.  The "demo" package depends on moveit_resources_panda_moveit_config,
-# installed from source above.
-
-RUN --mount=type=cache,target=/var/cache/apt \
-    mkdir -p ${ROS_ROOT}/src && cd ${ROS_ROOT}/src \
-    && git clone https://github.com/ros-planning/moveit_task_constructor.git -b humble \
-    && cd moveit_task_constructor && source ${ROS_ROOT}/setup.bash \
-    && cd msgs && bloom-generate rosdebian && fakeroot debian/rules binary \
-    && cd ../ && apt-get install -y ./*.deb && rm ./*.deb \
-    && cd rviz_marker_tools && bloom-generate rosdebian && fakeroot debian/rules binary \
-    && cd ../ && apt-get install -y ./*.deb && rm ./*.deb \
-    && cd core && bloom-generate rosdebian && fakeroot debian/rules binary DEB_BUILD_OPTIONS=nocheck \
-    && cd ../ && apt-get install -y ./*.deb && rm ./*.deb \
-    && cd capabilities && bloom-generate rosdebian && fakeroot debian/rules binary DEB_BUILD_OPTIONS=nocheck \
-    && cd ../ && apt-get install -y ./*.deb && rm ./*.deb \
-    && cd visualization && bloom-generate rosdebian && fakeroot debian/rules binary DEB_BUILD_OPTIONS=nocheck \
-    && cd ../ && apt-get install -y ./*.deb && rm ./*.deb \
-    && cd demo && bloom-generate rosdebian && fakeroot debian/rules binary DEB_BUILD_OPTIONS=nocheck \
-    && cd ../ && apt-get install -y ./*.deb && rm ./*.deb
-```
-
-and
-
-```bash
-# Install moveit2_tutorials from source (depends on moveit_hybrid_planning).
-RUN --mount=type=cache,target=/var/cache/apt \
-    mkdir -p ${ROS_ROOT}/src && cd ${ROS_ROOT}/src \
-    && git clone https://github.com/ros-planning/moveit2_tutorials.git -b humble \
-    && cd moveit2_tutorials && source ${ROS_ROOT}/setup.bash \
-    && bloom-generate rosdebian && fakeroot debian/rules binary \
-    && cd ../ && apt-get install -y ./*.deb && rm ./*.deb
-```
-
-### 2. Husarnet
+### 1. Husarnet
 
 - For now, install and join the network outside Docker. Unable to join while building the Docker containers.
 - For now, run `husarnet-dds singleshot` inside the running container. No effect when starting in Dockerfiles.
 
-### 3. Sourcing of ROS Workspaces on Entry
+### 2. Sourcing of ROS Workspaces on Entry
 
 - Only the first terminal instance running the Docker container source the ROS workspaces automatically. Subsequent instances do not.
 
-### 4. Jetson Clocks
+### 3. Jetson Clocks
 
 **UPDATE: After manually compiling the L4T 36.3 kernel and reflashing to enable USB modem connection (another unrelated issue), this issue seems to have been fixed.**
 
@@ -309,7 +268,7 @@ sudo systemctl restart jetsonClocks.service
 
 Where the second line can be replaced with `sudo jetson_clocks` if the service is not set up.
 
-### 5. ZED
+### 4. ZED
 
 When starting camera stream for the ZED camera within the Docker container using the following command:
 
@@ -331,6 +290,6 @@ Thereafter, the camera stream can be started within the container without errors
 
 This fix seems to not persist between boots. If needed, repeat the process to fix the issue after boot.
 
-### 6. Permission Issues with FLIR
+### 5. Permission Issues with FLIR
 
 Unable to obtain any FLIR camera feed or use FLIR spinnaker interface. Need to make sure the udev rules are correct (can be checked by `lsusb` to check the vendor id etc.). We noticed there were permission issues even after the udev rule fix, a temporary fix was to run `chmod 777 /dev/bus -R` to connect to camera.
