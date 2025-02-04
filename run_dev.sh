@@ -33,10 +33,18 @@ if [[ -f ~/.isaac_ros_common-config ]]; then
     . ~/.isaac_ros_common-config
 fi
 
+# Parse command-line args
+IMAGE_KEY=ros2_humble
+
+# Pick up config image key if specified
+if [[ ! -z "${CONFIG_IMAGE_KEY}" ]]; then
+    IMAGE_KEY=$CONFIG_IMAGE_KEY
+fi
+
 ISAAC_ROS_DEV_DIR="${ISAAC_ROS_WS}"
 SKIP_IMAGE_BUILD=0
 VERBOSE=0
-VALID_ARGS=$(getopt -o e:hvd:i:ba: --long env_file:,help,verbose,isaac_ros_dev_dir:,image_key:,skip_image_build,docker_arg: -- "$@")
+VALID_ARGS=$(getopt -o hvd:i:ba: --long help,verbose,isaac_ros_dev_dir:,image_key:,skip_image_build,docker_arg: -- "$@")
 eval set -- "$VALID_ARGS"
 while [ : ]; do
   case "$1" in
@@ -64,23 +72,11 @@ while [ : ]; do
         usage
         exit 0
         ;;
-    -e | --env_file)
-        ENV_FILE="$2"
-        shift 2
-        ;;
     --) shift;
         break
         ;;
   esac
 done
-
-# Parse command-line args
-IMAGE_KEY=ros2_humble
-
-# Pick up config image key if specified
-if [[ ! -z "${CONFIG_IMAGE_KEY}" ]]; then
-    IMAGE_KEY=$CONFIG_IMAGE_KEY
-fi
 
 # Setup on-exit traps
 ON_EXIT=()
