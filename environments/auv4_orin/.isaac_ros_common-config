@@ -1,0 +1,12 @@
+BUILD_IMAGE_FLAG=1
+
+# These parameters are only relevant if BUILD_IMAGE_FLAG=1
+CONFIG_IMAGE_KEY=ros2_humble.spinnaker.jtop.ccache.auv
+CONFIG_DOCKER_SEARCH_DIRS=("/home/aa/workspaces/ros2-docker/dockerfiles/common" "/home/aa/workspaces/ros2-docker/dockerfiles/isaac_ros_jp6.0")
+
+# Runs built image if BUILD_IMAGE_FLAG=0
+BUILT_IMAGE=isaac_ros_dev-aarch64:latest
+
+# Note that env variables like $HOME cannot be unpacked here
+MOUNT_DIRS=("/home/aa/workspaces/ros2_ws:/workspaces/ros2_ws")
+WORKDIR=/workspaces/isaac_ros_dev
