@@ -191,24 +191,15 @@ Take note to enclose it with `()` and ensure that there are no spaces.
 
 By default, the path to this directory is `$HOME/workspaces/ros2-docker`. Replace it below with the path to this directory if yours is different.
 
-For `isaac_ros_jp6.0`:
+E.g., for `isaac_ros_jp6.0`:
 
 ```bash
-export SOURCE_DIRECTORY=$HOME/workspaces/ros2-docker/isaac_ros_jp6.0
-ln -sf $SOURCE_DIRECTORY/.isaac_ros_common-config   ~/.isaac_ros_common-config
+export SOURCE_DIRECTORY=$HOME/workspaces/ros2-docker/
+export ENVIRONMENT_NAME=auv4_orin
+ln -sf $SOURCE_DIRECTORY/environments/$ENVIRONMENT_NAME/.isaac_ros_common-config   ~/.isaac_ros_common-config
 ln -sf $SOURCE_DIRECTORY/run_dev.sh                 ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/run_dev.sh
-ln -sf $SOURCE_DIRECTORY/run_main.sh                ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/run_main.sh
 unset SOURCE_DIRECTORY
-```
-
-For `isaac_ros_x64`:
-
-```bash
-export SOURCE_DIRECTORY=$HOME/workspaces/ros2-docker/isaac_ros_x64
-ln -sf $SOURCE_DIRECTORY/.isaac_ros_common-config   ~/.isaac_ros_common-config
-ln -sf $SOURCE_DIRECTORY/run_dev.sh                 ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/run_dev.sh
-ln -sf $SOURCE_DIRECTORY/run_main.sh                ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/run_main.sh
-unset SOURCE_DIRECTORY
+unset ENVIRONMENT_NAME
 ```
 
 4. Build the docker images.

@@ -1,0 +1,24 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+# Bash profile
+# For bash login shells, ~/.profile -> ~/.bashrc -> ~/.bash_aliases
+RUN mkdir -p /home/${USERNAME}
+# /etc/skel contains default config files for new users
+RUN cp /etc/skel/.profile /home/${USERNAME}/.profile
+RUN cp /etc/skel/.bashrc /home/${USERNAME}/.bashrc
+
+ARG LOCAL_ENV_FOLDER=auv4_orin
+COPY environments/${LOCAL_ENV_FOLDER}/.bash_aliases /home/${USERNAME}/.bash_aliases
+COPY environments/${LOCAL_ENV_FOLDER}/.bashrc /tmp/.bashrc
+
+# For bash login shells for user
+RUN cat /tmp/.bashrc >> /home/${USERNAME}/.bashrc
+# For vscode linting
+RUN cat /tmp/.bashrc >> /root/.bashrc
+RUN rm /tmp/.bashrc
+
+# Foxglove
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y \
+    ros-humble-foxglove-bridge
