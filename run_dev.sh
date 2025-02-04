@@ -205,7 +205,7 @@ print_info "Launching Isaac ROS Dev container with image key ${BASE_IMAGE_KEY}: 
 # Build image to launch
 if [[ $BUILD_IMAGE_FLAG -eq 1 ]]; then
     print_info "Building image keys $BASE_IMAGE_KEY base as image: $BASE_NAME"
-   $ROOT/build_image_layers.sh --image_key "$BASE_IMAGE_KEY" --image_name "$BASE_NAME" --context_dir "/home/aa/workspaces/ros2-docker/"
+   $ROOT/build_image_layers.sh --image_key "$BASE_IMAGE_KEY" --image_name "$BASE_NAME" --context_dir $DOCKER_CONTEXT_DIR
 
     # Check result
     if [ $? -ne 0 ]; then

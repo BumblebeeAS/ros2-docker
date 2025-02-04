@@ -10,3 +10,4 @@ BUILT_IMAGE=isaac_ros_dev-aarch64:latest
 # Note that env variables like $HOME cannot be unpacked here
 MOUNT_DIRS=("/home/aa/workspaces/ros2_ws:/workspaces/ros2_ws")
 WORKDIR=/workspaces/isaac_ros_dev
+DOCKER_CONTEXT_DIR=/home/aa/workspaces/ros2-docker/
