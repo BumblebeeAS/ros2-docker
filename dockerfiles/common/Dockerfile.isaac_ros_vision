@@ -4,11 +4,22 @@ FROM $BASE_IMAGE
 RUN --mount=type=cache,target=/var/cache/apt \
   apt-get update -y || true && \
   apt-get install -y \
+  # OpenCV
+  python3-opencv \
+  # Isaac ROS vision utils
   ros-humble-isaac-ros-test \
   ros-humble-isaac-ros-argus-camera \
   ros-humble-isaac-ros-image-pipeline \
-  ros-humble-isaac-ros-h264-encoder ros-humble-isaac-ros-h264-decoder \
-  ros-humble-isaac-ros-yolov8 ros-humble-isaac-ros-tensor-rt ros-humble-isaac-ros-dnn-image-encoder \
+  # Compression
+  ros-humble-isaac-ros-h264-encoder \
+  ros-humble-isaac-ros-h264-decoder \
+  # YOLO
+  ros-humble-isaac-ros-yolov8 \
+  ros-humble-isaac-ros-tensor-rt \
+  ros-humble-isaac-ros-dnn-image-encoder \
+  ros-humble-isaac-ros-nitros-detection2-d-array-type \
+  ros-humble-isaac-ros-triton \
+  # Foxglove
   ros-humble-foxglove-bridge
 
 # NOTES:
