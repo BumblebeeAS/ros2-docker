@@ -18,6 +18,10 @@ RUN cat /tmp/.bashrc >> /home/${USERNAME}/.bashrc
 RUN cat /tmp/.bashrc >> /root/.bashrc
 RUN rm /tmp/.bashrc
 
+# Entrypoint scripts
+COPY environments/${LOCAL_ENV_FOLDER}/on_entry.sh /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
+RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
+
 # Foxglove
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && apt-get install -y \
