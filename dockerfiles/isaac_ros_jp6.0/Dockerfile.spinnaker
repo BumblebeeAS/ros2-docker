@@ -1,7 +1,7 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
-RUN --mount=type=cache,target=/var/cache/apt \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   apt-get update -y || true && \
   apt-get install -y \
   libusb-1.0-0 \
@@ -23,14 +23,14 @@ RUN echo "libgentl libspinnaker/accepted-flir-eula boolean true" | debconf-set-s
 RUN yes "" | ./install_spinnaker_arm.sh
 
 # Running with Xephyr fixes flickering issue when running SpinView
-RUN --mount=type=cache,target=/var/cache/apt \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   apt-get update -y || true && \
   apt-get install -y \
   xserver-xephyr
 
 # Install ROS package for Spinnaker camera driver
 ARG ROS_DISTRO=humble
-RUN --mount=type=cache,target=/var/cache/apt \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   apt-get update -y || true && \
   apt-get install -y \
   ros-${ROS_DISTRO}-spinnaker-camera-driver

@@ -1,6 +1,19 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
+# Apt packages
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && apt-get install -y \
+    ncdu \
+    ros-humble-foxglove-bridge \
+    speedtest-cli \
+    tmux
+
+# Pip packages
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install \
+    tmuxp
+
 # Bash profile
 # For bash login shells, ~/.profile -> ~/.bashrc -> ~/.bash_aliases
 RUN mkdir -p /home/${USERNAME}
@@ -21,8 +34,3 @@ RUN rm /tmp/.bashrc
 # Entrypoint scripts
 COPY environments/${LOCAL_ENV_FOLDER}/on_entry.sh /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
 RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
-
-# Foxglove
-RUN --mount=type=cache,target=/var/cache/apt \
-    apt-get update && apt-get install -y \
-    ros-humble-foxglove-bridge

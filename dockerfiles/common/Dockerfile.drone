@@ -2,7 +2,7 @@ ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
 # Additional dependencies for the ROS2 packages px4_msgs and px4_msg_converter
-RUN --mount=type=cache,target=/var/cache/apt \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   apt-get update -y || true && \
   apt-get install -y \
   tmux \
