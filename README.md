@@ -191,7 +191,7 @@ Take note to enclose it with `()` and ensure that there are no spaces.
 
 By default, the path to this directory is `$HOME/workspaces/ros2-docker`. Replace it below with the path to this directory if yours is different.
 
-E.g., for `isaac_ros_jp6.0`:
+E.g.:
 
 ```bash
 export SOURCE_DIRECTORY=$HOME/workspaces/ros2-docker/
