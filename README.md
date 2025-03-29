@@ -11,8 +11,6 @@
   - [Installation on local computer](#installation-on-local-computer)
 - [Setup Workspaces](#setup-workspaces)
 - [Build Isaac ROS Docker Image](#build-isaac-ros-docker-image)
-- [Start Docker Container](#start-docker-container)
-  - [Development](#development)
   - [Production](#production)
   - [ROS Dependencies](#ros-dependencies)
 - [Notes](#notes)
@@ -210,24 +208,9 @@ cd ${ISAAC_ROS_WS}/src/isaac_ros_common
 ./scripts/run_dev.sh
 ```
 
-# Start Docker Container
-
-`run_dev.sh` is for development, while `run_main.sh` is for production. The difference is that `run_dev.sh` attempts a Docker image build each time, while `run_main.sh` looks up an existing Docker image.
-
-## Development
-
-```bash
-cd ${ISAAC_ROS_WS}/src/isaac_ros_common
-./scripts/run_dev.sh
-```
-
 ## Production
 
-`run_main.sh` is meant to run a built image, which can be built by `run_dev.sh`.
-
 By default, file changes (except in the mounted workspaces) and installations in a running Docker container are not persistent. To save the current state of the container's filesystem to an image, do `docker container commit` (https://docs.docker.com/reference/cli/docker/container/commit/).
-
-`run_main.sh` requires the environment variable `BUILT_DOCKER_CONTAINER_NAME`. It reads environment variables from `ENV_FILE`, which by default is `$HOME/workspaces/ros2-docker/environments/.env`. If the path of your file is different, change `ENV_FILE` in `run_main.sh`.
 
 ## ROS Dependencies
 

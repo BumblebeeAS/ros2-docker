@@ -1,3 +1,0 @@
-CONFIG_IMAGE_KEY=ros2_humble.isaac_ros_vision.husarnet
-
-CONFIG_DOCKER_SEARCH_DIRS=($HOME/workspaces/ros2-docker/isaac_ros_x64)
