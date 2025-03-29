@@ -296,7 +296,6 @@ docker run -it --rm \
     -v $ISAAC_ROS_DEV_DIR:/workspaces/isaac_ros-dev \
     -v /etc/localtime:/etc/localtime:ro \
     -v /dev/:/dev/ \
-    -v $HOME/.cache/ccache:/home/admin/.cache/ccache \
     --name $CONTAINER_NAME \
     --runtime nvidia \
     --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh \

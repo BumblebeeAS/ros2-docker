@@ -8,6 +8,6 @@ CONFIG_DOCKER_SEARCH_DIRS=("$HOME/workspaces/ros2-docker/dockerfiles/common" "$H
 BUILT_IMAGE=isaac_ros_dev-aarch64:latest
 
 # Note that env variables like $HOME cannot be unpacked here
-MOUNT_DIRS=("$HOME/workspaces/ros2_ws:/workspaces/ros2_ws")
+MOUNT_DIRS=("$HOME/workspaces/ros2_ws:/workspaces/ros2_ws" "$HOME/.cache/ccache:/home/admin/.cache/ccache")
 WORKDIR=/workspaces/ros2_ws
 DOCKER_CONTEXT_DIR=$HOME/workspaces/ros2-docker/
