@@ -41,7 +41,12 @@ COPY ${LOCAL_ENV_FOLDER}/on_entry.sh /usr/local/bin/scripts/entrypoint_additions
 RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
 
 # Install ROS dependencies
-COPY ${LOCAL_ENV_FOLDER}/rosdep.list /tmp/rosdep.list
+COPY ${LOCAL_ENV_FOLDER}/rosdep-apt.list /tmp/rosdep-apt.list
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    xargs -a /tmp/rosdep.list apt-get install -y
-RUN rm /tmp/rosdep.list
+    xargs -a /tmp/rosdep-apt.list apt-get install -y
+RUN rm /tmp/rosdep-apt.list
+
+COPY ${LOCAL_ENV_FOLDER}/rosdep-pip.list /tmp/rosdep-pip.list
+RUN --mount=type=cache,target=/root/.cache/pip \
+    xargs -a /tmp/rosdep-pip.list pip3 install -U
+RUN rm /tmp/rosdep-pip.list

@@ -219,8 +219,13 @@ Then, you can set the `BUILD_IMAGE_FLAG=0` in `.isaac_ros_common-config` (in the
 Run the following command in your ROS workspace to generate a list of `apt` packages required.
 
 ```bash
-rosdep install --from-paths src --ignore-src --reinstall --simulate | grep "apt-get install" | sed 's/.*apt-get install
-//g'
+rosdep install --from-paths src --ignore-src --reinstall --simulate | grep "apt-get install" | sed 's/.*apt-get install //g'
+```
+
+Similaly, run the following for a list of `pip` packages.
+
+```bash
+rosdep install --from-paths src --ignore-src --reinstall --simulate | grep "pip3 install -U -I" | sed 's/.*pip3 install -U -I //g'
 ```
 
 Save this as a file in your environment directory and install it in the corresponding Dockerfile. See [environments/auv4_orin/rosdep.list](environments/auv4_orin/rosdep.list) and [dockerfiles/common/Dockerfile.auv4_orin](dockerfiles/common/Dockerfile.auv4_orin) for an example.
