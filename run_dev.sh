@@ -297,8 +297,6 @@ docker run -it --rm \
     -v /etc/localtime:/etc/localtime:ro \
     -v /dev/:/dev/ \
     -v $HOME/.cache/ccache:/home/admin/.cache/ccache \
-    -e CC=/usr/lib/ccache/gcc \
-    -e CXX=/usr/lib/ccache/g++ \
     --name $CONTAINER_NAME \
     --runtime nvidia \
     --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh \
