@@ -39,3 +39,9 @@ COPY ${LOCAL_ENV_FOLDER}/.tmuxp.yaml /home/${USERNAME}/.tmuxp.yaml
 # Entrypoint scripts
 COPY ${LOCAL_ENV_FOLDER}/on_entry.sh /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
 RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
+
+# Install ROS dependencies
+COPY ${LOCAL_ENV_FOLDER}/rosdep.list /tmp/rosdep.list
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    xargs -a /tmp/rosdep.list apt-get install -y
+RUN rm /tmp/rosdep.list
