@@ -21,9 +21,10 @@ RUN mkdir -p /home/${USERNAME}
 RUN cp /etc/skel/.profile /home/${USERNAME}/.profile
 RUN cp /etc/skel/.bashrc /home/${USERNAME}/.bashrc
 
-ARG LOCAL_ENV_FOLDER=auv4_orin
-COPY environments/${LOCAL_ENV_FOLDER}/.bash_aliases /home/${USERNAME}/.bash_aliases
-COPY environments/${LOCAL_ENV_FOLDER}/.bashrc /tmp/.bashrc
+ARG LOCAL_ENV_FOLDER=environments/auv4_orin
+
+COPY ${LOCAL_ENV_FOLDER}/.bash_aliases /home/${USERNAME}/.bash_aliases
+COPY ${LOCAL_ENV_FOLDER}/.bashrc /tmp/.bashrc
 
 # For bash login shells for user
 RUN cat /tmp/.bashrc >> /home/${USERNAME}/.bashrc
@@ -31,6 +32,10 @@ RUN cat /tmp/.bashrc >> /home/${USERNAME}/.bashrc
 RUN cat /tmp/.bashrc >> /root/.bashrc
 RUN rm /tmp/.bashrc
 
+# Tmux and tmuxp
+COPY environments/common/.tmux.conf /home/${USERNAME}/.tmux.conf
+COPY ${LOCAL_ENV_FOLDER}/.tmuxp.yaml /home/${USERNAME}/.tmuxp.yaml
+
 # Entrypoint scripts
-COPY environments/${LOCAL_ENV_FOLDER}/on_entry.sh /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
+COPY ${LOCAL_ENV_FOLDER}/on_entry.sh /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
 RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh

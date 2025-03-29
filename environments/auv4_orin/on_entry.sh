@@ -9,3 +9,8 @@ if [ -d $WORKSPACE_DIR ]; then
     echo "rosdep updating..." ; 
     rosdep install --from-paths src -y --ignore-src ; 
 fi
+
+if [ -f ~/.tmuxp.yaml ]; then
+    echo "Starting tmux session..."
+    tmuxp load -d ~/.tmuxp.yaml
+fi
