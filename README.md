@@ -212,6 +212,8 @@ cd ${ISAAC_ROS_WS}/src/isaac_ros_common
 
 By default, file changes (except in the mounted workspaces) and installations in a running Docker container are not persistent. To save the current state of the container's filesystem to an image, do `docker container commit` (https://docs.docker.com/reference/cli/docker/container/commit/).
 
+Then, you can set the `BUILD_IMAGE_FLAG=0` in `.isaac_ros_common-config` (in the environment directory) and set `BUILT_IMAGE` to the image tag. This runs the built image instead of building a new image each time when starting the container.
+
 ## ROS Dependencies
 
 Run the following command in your ROS workspace to generate a list of `apt` packages required.
