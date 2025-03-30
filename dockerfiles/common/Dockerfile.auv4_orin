@@ -50,3 +50,6 @@ COPY ${LOCAL_ENV_FOLDER}/rosdep-pip.list /tmp/rosdep-pip.list
 RUN --mount=type=cache,target=/root/.cache/pip \
     xargs -a /tmp/rosdep-pip.list pip3 install -U
 RUN rm /tmp/rosdep-pip.list
+
+# Terminal color
+ENV TERM=xterm-256color
