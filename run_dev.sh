@@ -292,7 +292,11 @@ fi
 # Create an interactive session but detach. For use in startup scripts.
 # This allows the container to run in the background and be attached to later.
 # "tail -f /dev/null" keeps the container running.
-# To attach to the container for development, run: "docker run -it ... /bin/bash" instead
+# To attach to the container, simply run this script again. 
+# (See "Attaching to running container" above.)
+
+# For development, consider running: "docker run -it ... /bin/bash" instead
+# to not have to run the script twice to get a shell.
 docker run -dit --rm \
     --privileged \
     --network host \
