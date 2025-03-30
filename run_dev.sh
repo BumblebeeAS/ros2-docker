@@ -288,7 +288,12 @@ print_info "Running $CONTAINER_NAME"
 if [[ $VERBOSE -eq 1 ]]; then
     set -x
 fi
-docker run -it --rm \
+
+# Create an interactive session but detach. For use in startup scripts.
+# This allows the container to run in the background and be attached to later.
+# "tail -f /dev/null" keeps the container running.
+# To attach to the container for development, run: "docker run -it ... /bin/bash" instead
+docker run -dit --rm \
     --privileged \
     --network host \
     --ipc=host \
@@ -300,4 +305,4 @@ docker run -it --rm \
     --runtime nvidia \
     --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh \
     $BASE_NAME \
-    /bin/bash \
+    tail -f /dev/null
