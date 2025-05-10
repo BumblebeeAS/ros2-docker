@@ -1,7 +1,7 @@
 BUILD_IMAGE_FLAG=1
 
 # These parameters are only relevant if BUILD_IMAGE_FLAG=1
-CONFIG_IMAGE_KEY=ros2_humble.ccache
+CONFIG_IMAGE_KEY=ros2_humble.ccache.auv4_orin
 CONFIG_DOCKER_SEARCH_DIRS=("$HOME/workspaces/ros2-docker/dockerfiles/common" "$HOME/workspaces/ros2-docker/dockerfiles/isaac_ros_x64")
 
 # Runs built image if BUILD_IMAGE_FLAG=0

@@ -1,0 +1,13 @@
+session_name: laptop
+start_directory: /workspaces/ros2_ws
+
+suppress_history: false
+windows:
+  - window_name: image_matching
+    layout: tiled
+    shell_command_before:
+      - source install/setup.bash
+    focus: true
+    panes:
+      - ros2 launch image_matching pose_estimator.launch.py
+      -
