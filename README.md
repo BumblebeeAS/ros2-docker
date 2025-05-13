@@ -9,7 +9,6 @@
     - [Jetson Clocks (Optional)](#jetson-clocks-optional)
     - [Add Authorized SSH Keys (Optional)](#add-authorized-ssh-keys-optional)
   - [Installation on local computer](#installation-on-local-computer)
-- [Setup Workspaces](#setup-workspaces)
 - [Build Isaac ROS Docker Image](#build-isaac-ros-docker-image)
   - [Production](#production)
   - [ROS Dependencies](#ros-dependencies)
@@ -142,18 +141,6 @@ This is for decoding images compressed on the Jetson.
 Follow https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/index.html
 and https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html to set up
 Isaac ROS docker dev environment.
-
-# Setup Workspaces
-
-1. Make the drone ROS workspace:
-
-```bash
-mkdir -p ~/workspaces/drone/src
-```
-
-2. Clone https://github.com/BumblebeeAS/software-uav-2 into `~/workspaces/drone/src`
-
-3. Follow the setup guide at https://github.com/BumblebeeAS/software-uav-2
 
 # Build Isaac ROS Docker Image
 
