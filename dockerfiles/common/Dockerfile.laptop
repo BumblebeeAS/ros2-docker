@@ -1,0 +1,60 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+# Apt packages
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && apt-get install -y \
+    iproute2 \
+    ncdu \
+    ros-humble-foxglove-bridge \
+    speedtest-cli \
+    tmux
+
+# Pip packages
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install \
+    tmuxp
+
+# Bash profile
+# For bash login shells, ~/.profile -> ~/.bashrc -> ~/.bash_aliases
+RUN mkdir -p /home/${USERNAME}
+# /etc/skel contains default config files for new users
+RUN cp /etc/skel/.profile /home/${USERNAME}/.profile
+RUN cp /etc/skel/.bashrc /home/${USERNAME}/.bashrc
+
+ARG LOCAL_ENV_FOLDER=environments/laptop
+
+COPY ${LOCAL_ENV_FOLDER}/.bash_aliases /home/${USERNAME}/.bash_aliases
+COPY ${LOCAL_ENV_FOLDER}/.bashrc /tmp/.bashrc
+
+# For bash login shells for user
+RUN cat /tmp/.bashrc >> /home/${USERNAME}/.bashrc
+# For vscode linting
+RUN cat /tmp/.bashrc >> /root/.bashrc
+RUN rm /tmp/.bashrc
+
+# Tmux and tmuxp
+COPY environments/common/.tmux.conf /home/${USERNAME}/.tmux.conf
+COPY ${LOCAL_ENV_FOLDER}/.tmuxp.yaml /home/${USERNAME}/.tmuxp.yaml
+
+# Entrypoint scripts
+COPY ${LOCAL_ENV_FOLDER}/on_entry.sh /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
+RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
+
+# Install ROS dependencies
+COPY ${LOCAL_ENV_FOLDER}/rosdep-apt.list /tmp/rosdep-apt.list
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && xargs -a /tmp/rosdep-apt.list apt-get install -y
+RUN rm /tmp/rosdep-apt.list
+
+COPY ${LOCAL_ENV_FOLDER}/rosdep-pip.list /tmp/rosdep-pip.list
+RUN --mount=type=cache,target=/root/.cache/pip \
+    xargs -a /tmp/rosdep-pip.list pip3 install -U
+RUN rm /tmp/rosdep-pip.list
+
+# Install colcon clean
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install -U colcon-clean
+
+# Terminal color
+ENV TERM=xterm-256color
