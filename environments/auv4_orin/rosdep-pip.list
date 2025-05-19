@@ -1,3 +1,4 @@
 transforms3d
 opencv-contrib-python
 imutils
+kornia
