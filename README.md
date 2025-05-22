@@ -144,7 +144,7 @@ Isaac ROS docker dev environment.
 
 # Build Isaac ROS Docker Image
 
-For SBC, use `isaac_ros_jp6.0`. For local computer, use `isaac_ros_x64`.
+For Nvidia Jetson computers, use `isaac_ros_jp6`. For normal `x64` computers, use `isaac_ros_x64`.
 
 1. Clone `isaac_ros_common`.
 
@@ -157,10 +157,10 @@ Correct as of 28 Dec 2024. Replace `release-3.2` with the latest stable release.
 
 2. Edit the Isaac ROS Common config file by setting `CONFIG_DOCKER_SEARCH_DIRS` as
 
-For `isaac_ros_jp6.0`:
+For `isaac_ros_jp6`:
 
 ```
-(<Path to this directory>/isaac_ros_jp6.0)
+(<Path to this directory>/isaac_ros_jp6)
 ```
 
 For `isaac_ros_x64`:
