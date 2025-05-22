@@ -2,3 +2,5 @@ transforms3d
 opencv-contrib-python
 imutils
 kornia
+typer
+supervision

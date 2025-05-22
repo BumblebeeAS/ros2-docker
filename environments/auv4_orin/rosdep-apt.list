@@ -13,3 +13,4 @@ ros-humble-isaac-ros-common
 ros-humble-ament-clang-format
 ros-humble-isaac-ros-nitros-image-type
 ros-humble-isaac-ros-nitros-camera-info-type
+ros-humble-foxglove-msgs
