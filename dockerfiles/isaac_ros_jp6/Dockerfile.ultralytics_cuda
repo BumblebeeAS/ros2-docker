@@ -1,12 +1,33 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
-RUN python3 -m pip install  \
+# Tested with JetPack 6.1 (on 22 May 2025)
+# Reference: https://docs.ultralytics.com/guides/nvidia-jetson/#run-on-jetpack-61
+
+# --no-deps to not override torch installed in Isaac ROS containers
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-deps  \
     ultralytics
 
-RUN apt-get install libopenmpi-dev libopenblas-base libomp-dev -y 
-RUN python3 -m pip install https://github.com/ultralytics/assets/releases/download/v0.0.0/torch-2.3.0-cp310-cp310-linux_aarch64.whl \
-    https://github.com/ultralytics/assets/releases/download/v0.0.0/torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl
+# Dependencies for ultralytics excluding torch and torchvision
+# Obtained from "pip show ultralytics"
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install \
+    matplotlib \
+    numpy \
+    opencv-python \
+    pandas \
+    pillow \
+    psutil \
+    py-cpuinfo \
+    pyyaml \
+    requests \
+    scipy \
+    tqdm \
+    ultralytics-thop 
 
-RUN wget https://nvidia.box.com/shared/static/48dtuob7meiw6ebgfsfqakc9vse62sg4.whl -O onnxruntime_gpu-1.18.0-cp310-cp310-linux_aarch64.whl 
-RUN python3 -m pip install onnxruntime_gpu-1.18.0-cp310-cp310-linux_aarch64.whl
+# torchvision and onnxruntime_gpu
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install \
+    https://github.com/ultralytics/assets/releases/download/v0.0.0/torchvision-0.20.0a0+afc54f7-cp310-cp310-linux_aarch64.whl \
+    https://github.com/ultralytics/assets/releases/download/v0.0.0/onnxruntime_gpu-1.20.0-cp310-cp310-linux_aarch64.whl
