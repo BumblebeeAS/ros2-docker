@@ -10,11 +10,12 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     ultralytics
 
 # Dependencies for ultralytics excluding torch and torchvision
-# Obtained from "pip show ultralytics"
+# Obtained from "pip show ultralytics" + "onnxslim" for exporting of models
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
     matplotlib \
     numpy \
+    onnxslim \
     opencv-python \
     pandas \
     pillow \
@@ -24,7 +25,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     requests \
     scipy \
     tqdm \
-    ultralytics-thop 
+    ultralytics-thop
 
 # torchvision and onnxruntime_gpu
 RUN --mount=type=cache,target=/root/.cache/pip \
