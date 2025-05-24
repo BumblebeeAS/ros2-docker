@@ -1,0 +1,10 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+# As of 25 May 2025, the dependency versions required by ultralytics
+# match the packages installed in the x86_64 image.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install \
+    ultralytics \
+    onnxslim \
+    onnxruntime_gpu

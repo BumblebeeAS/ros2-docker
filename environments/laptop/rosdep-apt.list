@@ -9,8 +9,8 @@ ros-humble-isaac-ros-managed-nitros
 ros-humble-isaac-ros-tensor-list-interfaces
 ros-humble-isaac-ros-nitros-tensor-list-type
 python3-opencv
-libopencv-dev
 ros-humble-isaac-ros-common
 ros-humble-ament-clang-format
 ros-humble-isaac-ros-nitros-image-type
 ros-humble-isaac-ros-nitros-camera-info-type
+ros-humble-foxglove-msgs
