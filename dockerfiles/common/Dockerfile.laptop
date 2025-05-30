@@ -42,6 +42,14 @@ COPY ${LOCAL_ENV_FOLDER}/on_entry.sh /usr/local/bin/scripts/entrypoint_additions
 RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
 
 # Install ROS dependencies
+
+# The apt-packaged version of transforms3d is old, pip install transforms3d
+# separately before installing tf_transformations via apt to avoid errors from pip
+# uninstalling packages installed by distutils.
+# See https://github.com/matthew-brett/transforms3d/issues/65
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install -U transforms3d
+
 COPY ${LOCAL_ENV_FOLDER}/rosdep-apt.list /tmp/rosdep-apt.list
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && xargs -a /tmp/rosdep-apt.list apt-get install -y
