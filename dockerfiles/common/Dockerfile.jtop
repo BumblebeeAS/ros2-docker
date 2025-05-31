@@ -1,4 +1,5 @@
 # Fixes "Mismatch version jtop service: [4.3.0] and client: [4.2.12]" where jtop version outside container is larger
+# Not required for JP6.2 (as of 2025-05-31)
 
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
