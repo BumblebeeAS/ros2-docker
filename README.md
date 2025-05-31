@@ -20,6 +20,7 @@
     - [ZED](#zed)
     - [Permission Issues with FLIR](#permission-issues-with-flir)
     - [Permission Issues (General)](#permission-issues-general)
+    - [Docker Max Depth Exceeded](#docker-max-depth-exceeded)
 
 # Installation
 
@@ -275,3 +276,7 @@ Unable to obtain any FLIR camera feed or use FLIR spinnaker interface. Need to m
 Directories / files created by Dockerfiles and helper scripts run in root as well as directories mounted that are not present previously will have `root` as the owner (e.g., `~/.cache/ccache` if it was not present before mounting). Simply do `sudo chmod <user> -R <directory>`.
 
 (If changing ownership fixes [Permission Issues with FLIR](#permission-issues-with-flir), remove it.)
+
+### Docker Max Depth Exceeded
+
+As of 31 May 2025, having more than 5 image keys (e.g., `ros2_humble.ultralytics_cuda.spinnaker.jtop.ccache.auv4_orin`), will result in a `docker: Error response from daemon: max depth exceeded` error.
