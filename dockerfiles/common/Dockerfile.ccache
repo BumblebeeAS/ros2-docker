@@ -6,6 +6,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   apt-get install -y \
   ccache
 
-ENV CCACHE_DIR=/home/${USERNAME}/.cache/ccache
-ENV CC=/usr/lib/ccache/gcc
-ENV CXX=/usr/lib/ccache/g++
+ENV CCACHE_DIR=/home/${USERNAME}/.cache/ccache \
+  CC=/usr/lib/ccache/gcc \
+  CXX=/usr/lib/ccache/g++

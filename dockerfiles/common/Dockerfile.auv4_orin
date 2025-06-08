@@ -13,29 +13,31 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Pip packages
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
-    tmuxp
+    tmuxp \
+    colcon-clean
 
 # Bash profile
 # For bash login shells, ~/.profile -> ~/.bashrc -> ~/.bash_aliases
 RUN mkdir -p /home/${USERNAME}
 # /etc/skel contains default config files for new users
-RUN cp /etc/skel/.profile /home/${USERNAME}/.profile
-RUN cp /etc/skel/.bashrc /home/${USERNAME}/.bashrc
+RUN cp /etc/skel/.profile /home/${USERNAME}/.profile \
+    && cp /etc/skel/.bashrc /home/${USERNAME}/.bashrc
 
 ARG LOCAL_ENV_FOLDER=environments/auv4_orin
 
 COPY ${LOCAL_ENV_FOLDER}/.bash_aliases /home/${USERNAME}/.bash_aliases
 COPY ${LOCAL_ENV_FOLDER}/.bashrc /tmp/.bashrc
 
-# For bash login shells for user
-RUN cat /tmp/.bashrc >> /home/${USERNAME}/.bashrc
-# For vscode linting
-RUN cat /tmp/.bashrc >> /root/.bashrc
-RUN rm /tmp/.bashrc
+# Append to .bashrc in $HOME for user's bash login shells
+# Append to .bashrc in root for VSCode linting
+RUN cat /tmp/.bashrc >> /home/${USERNAME}/.bashrc \
+    && cat /tmp/.bashrc >> /root/.bashrc \
+    && rm /tmp/.bashrc
 
 # Tmux and tmuxp
-COPY environments/common/.tmux.conf /home/${USERNAME}/.tmux.conf
-COPY ${LOCAL_ENV_FOLDER}/.tmuxp.yaml /home/${USERNAME}/.tmuxp.yaml
+COPY environments/common/.tmux.conf \
+    ${LOCAL_ENV_FOLDER}/.tmuxp.yaml \
+    /home/${USERNAME}/
 
 # Entrypoint scripts
 COPY ${LOCAL_ENV_FOLDER}/on_entry.sh /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
@@ -50,19 +52,15 @@ RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install -U transforms3d
 
-COPY ${LOCAL_ENV_FOLDER}/rosdep-apt.list /tmp/rosdep-apt.list
+COPY ${LOCAL_ENV_FOLDER}/rosdep-apt.list \
+    ${LOCAL_ENV_FOLDER}/rosdep-pip.list \
+    /tmp/
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    apt-get update && xargs -a /tmp/rosdep-apt.list apt-get install -y
-RUN rm /tmp/rosdep-apt.list
-
-COPY ${LOCAL_ENV_FOLDER}/rosdep-pip.list /tmp/rosdep-pip.list
+    apt-get update && xargs -a /tmp/rosdep-apt.list apt-get install -y \
+    && rm /tmp/rosdep-apt.list
 RUN --mount=type=cache,target=/root/.cache/pip \
-    xargs -a /tmp/rosdep-pip.list pip3 install -U
-RUN rm /tmp/rosdep-pip.list
-
-# Install colcon clean
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip3 install -U colcon-clean
+    xargs -a /tmp/rosdep-pip.list pip3 install -U \
+    && rm /tmp/rosdep-pip.list
 
 # Terminal color
 ENV TERM=xterm-256color
