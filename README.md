@@ -279,4 +279,4 @@ Directories / files created by Dockerfiles and helper scripts run in root as wel
 
 ### Docker Max Depth Exceeded
 
-As of 31 May 2025, having more than 5 image keys (e.g., `ros2_humble.ultralytics_cuda.spinnaker.jtop.ccache.auv4_orin`), will result in a `docker: Error response from daemon: max depth exceeded` error.
+As of 31 May 2025, having too many image layers will result in a `docker: Error response from daemon: max depth exceeded` error. The maximum number of image layers seems to be 208 (run `docker history <image_name> | wc -l` to check).
