@@ -1,34 +1,36 @@
-- [Installation](#installation)
-  - [Installation on SBC](#installation-on-sbc)
-    - [Setup Docker](#setup-docker)
+# Isaac ROS Docker
+
+A set of scripts to ease development with [Isaac ROS Docker containers](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_common/index.html).
+
+- [Isaac ROS Docker](#isaac-ros-docker)
+  - [Installation](#installation)
+    - [Installation on SBC](#installation-on-sbc)
       - [Install Jetpack](#install-jetpack)
       - [Install Docker](#install-docker)
       - [Add Docker to User Group](#add-docker-to-user-group)
-    - [Jetson Setup for VPI](#jetson-setup-for-vpi)
-    - [Setup Isaac ROS](#setup-isaac-ros)
-    - [Jetson Clocks (Optional)](#jetson-clocks-optional)
-    - [Add Authorized SSH Keys (Optional)](#add-authorized-ssh-keys-optional)
-  - [Installation on local computer](#installation-on-local-computer)
-- [Build Isaac ROS Docker Image](#build-isaac-ros-docker-image)
+      - [Jetson Setup for VPI](#jetson-setup-for-vpi)
+      - [Setup Isaac ROS](#setup-isaac-ros)
+      - [Jetson Clocks (Optional)](#jetson-clocks-optional)
+      - [Add Authorized SSH Keys (Optional)](#add-authorized-ssh-keys-optional)
+    - [Installation on local computer](#installation-on-local-computer)
+  - [Build Isaac ROS Docker Image](#build-isaac-ros-docker-image)
   - [Production](#production)
   - [ROS Dependencies](#ros-dependencies)
-- [Notes](#notes)
-  - [TODO](#todo)
-  - [Issues](#issues)
-    - [Husarnet](#husarnet)
-    - [Jetson Clocks](#jetson-clocks)
-    - [ZED](#zed)
-    - [Permission Issues with FLIR](#permission-issues-with-flir)
-    - [Permission Issues (General)](#permission-issues-general)
-    - [Docker Max Depth Exceeded](#docker-max-depth-exceeded)
+  - [Notes](#notes)
+    - [TODO](#todo)
+    - [Issues](#issues)
+      - [Husarnet](#husarnet)
+      - [Jetson Clocks](#jetson-clocks)
+      - [ZED](#zed)
+      - [Permission Issues with FLIR](#permission-issues-with-flir)
+      - [Permission Issues (General)](#permission-issues-general)
+      - [Docker Max Depth Exceeded](#docker-max-depth-exceeded)
 
-# Installation
+## Installation
 
 _For ease of installation, save this directory as `~/workspaces/ros2-docker`._
 
-## Installation on SBC
-
-### Setup Docker
+### Installation on SBC
 
 Source: https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/index.html
 
@@ -69,7 +71,7 @@ newgrp docker
 
 Reboot the computer for the changes to take effect.
 
-### Jetson Setup for VPI
+#### Jetson Setup for VPI
 
 Source: https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/jetson_vpi.html
 
@@ -85,7 +87,7 @@ sudo apt-get update
 sudo apt-get install -y pva-allow-2
 ```
 
-### Setup Isaac ROS
+#### Setup Isaac ROS
 
 Source: https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html
 
@@ -102,7 +104,7 @@ echo "export ISAAC_ROS_WS=${HOME}/workspaces/isaac_ros-dev/" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### Jetson Clocks (Optional)
+#### Jetson Clocks (Optional)
 
 Running `sudo jetson_clocks` maximises Jetson performance. We can make `jetson_clocks` run on start up.
 
@@ -131,21 +133,17 @@ sudo systemctl enable jetsonClocks.service
 
 Reboot the computer to let the changes take effect.
 
-### Add Authorized SSH Keys (Optional)
+#### Add Authorized SSH Keys (Optional)
 
 To avoid keying in the password each time login in via SSH, add the client computer's public key (e.g. `id_rsa.pub`) into `~/.ssh/authorized_keys`. Note that `~/.ssh/authorized_keys` should be a **file** not a folder.
 
-## Installation on local computer
-
-This is for decoding images compressed on the Jetson.
+### Installation on local computer
 
 Follow https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/index.html
 and https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html to set up
 Isaac ROS docker dev environment.
 
-# Build Isaac ROS Docker Image
-
-For Nvidia Jetson computers, use `isaac_ros_jp6`. For normal `x64` computers, use `isaac_ros_x64`.
+## Build Isaac ROS Docker Image
 
 1. Clone `isaac_ros_common`.
 
@@ -154,31 +152,15 @@ cd ${ISAAC_ROS_WS}/src && \
    git clone -b release-3.2 https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git isaac_ros_common
 ```
 
-Correct as of 28 Dec 2024. Replace `release-3.2` with the latest stable release.
+`release-3.2` is the latest stable release as of 10 Jun 2025. Feel free to replace it with the latest stable release otherwise.
 
-2. Edit the Isaac ROS Common config file by setting `CONFIG_DOCKER_SEARCH_DIRS` as
-
-For `isaac_ros_jp6`:
-
-```
-(<Path to this directory>/isaac_ros_jp6)
-```
-
-For `isaac_ros_x64`:
-
-```
-(<Path to this directory>/isaac_ros_x64)
-```
-
-By default, `<Path to this directory>` is `$HOME/workspaces/ros2-docker`.
-
-Take note to enclose it with `()` and ensure that there are no spaces.
+2. Choose or create an environment in the environments folder.
 
 3. Create copies and symbolic links for the required config files and scripts.
 
 By default, the path to this directory is `$HOME/workspaces/ros2-docker`. Replace it below with the path to this directory if yours is different.
 
-E.g.:
+For example, for the `auv4_orin` environment:
 
 ```bash
 export SOURCE_DIRECTORY=$HOME/workspaces/ros2-docker/
@@ -218,21 +200,21 @@ rosdep install --from-paths src --ignore-src --reinstall --simulate | grep "pip3
 
 Save this as a file in your environment directory and install it in the corresponding Dockerfile. See [environments/auv4_orin/rosdep.list](environments/auv4_orin/rosdep.list) and [dockerfiles/common/Dockerfile.auv4_orin](dockerfiles/common/Dockerfile.auv4_orin) for an example.
 
-# Notes
+## Notes
 
-## TODO
+### TODO
 
 - (Good to have) combine Isaac ROS and Husarnet default Fast RTPS scripts to poll topics outside of container while publishing over the internet
 - (Good to have) Consider https://github.com/husarnet/ros-docker/tree/main
 
-## Issues
+### Issues
 
-### Husarnet
+#### Husarnet
 
 - For now, install and join the network outside Docker. Unable to join while building the Docker containers.
 - For now, run `husarnet-dds singleshot` inside the running container. No effect when starting in Dockerfiles.
 
-### Jetson Clocks
+#### Jetson Clocks
 
 **UPDATE: After manually compiling the L4T 36.3 kernel and reflashing to enable USB modem connection (another unrelated issue), this issue seems to have been fixed.**
 
@@ -245,7 +227,7 @@ sudo systemctl restart jetsonClocks.service
 
 Where the second line can be replaced with `sudo jetson_clocks` if the service is not set up.
 
-### ZED
+#### ZED
 
 When starting camera stream for the ZED camera within the Docker container using the following command:
 
@@ -267,16 +249,16 @@ Thereafter, the camera stream can be started within the container without errors
 
 This fix seems to not persist between boots. If needed, repeat the process to fix the issue after boot.
 
-### Permission Issues with FLIR
+#### Permission Issues with FLIR
 
 Unable to obtain any FLIR camera feed or use FLIR spinnaker interface. Need to make sure the udev rules are correct (can be checked by `lsusb` to check the vendor id etc.). We noticed there were permission issues even after the udev rule fix, a temporary fix was to run `chmod 777 /dev/bus -R` to connect to camera.
 
-### Permission Issues (General)
+#### Permission Issues (General)
 
 Directories / files created by Dockerfiles and helper scripts run in root as well as directories mounted that are not present previously will have `root` as the owner (e.g., `~/.cache/ccache` if it was not present before mounting). Simply do `sudo chmod <user> -R <directory>`.
 
 (If changing ownership fixes [Permission Issues with FLIR](#permission-issues-with-flir), remove it.)
 
-### Docker Max Depth Exceeded
+#### Docker Max Depth Exceeded
 
 As of 31 May 2025, having too many image layers will result in a `docker: Error response from daemon: max depth exceeded` error. The maximum number of image layers seems to be 208 (run `docker history <image_name> | wc -l` to check).
