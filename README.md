@@ -154,7 +154,7 @@ cd ${ISAAC_ROS_WS}/src && \
 
 `release-3.2` is the latest stable release as of 10 Jun 2025. Feel free to replace it with the latest stable release otherwise.
 
-2. Choose or create an environment in the environments folder.
+2. Choose or create an environment in the `environments` folder.
 
 3. Create copies and symbolic links for the required config files and scripts.
 
