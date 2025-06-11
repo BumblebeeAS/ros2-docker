@@ -1,7 +1,10 @@
 BUILD_IMAGE_FLAG=1
 
 # These parameters are only relevant if BUILD_IMAGE_FLAG=1
-CONFIG_IMAGE_KEY=ros2_humble.ultralytics_cuda.spinnaker.ccache.auv4_orin
+# CuDNN is in the Isaac ROS x86_64 image but not in the JP6 image for some reason.
+# ros2_gpg_fix is temporary. See https://discourse.ros.org/t/ros-gpg-key-expiration-incident/20669.
+# Wait for the Isaac ROS team to update the image.
+CONFIG_IMAGE_KEY=ros2_humble.ultralytics_cuda.spinnaker.cudnn.ccache.ros2_gpg_fix.auv4_orin
 CONFIG_DOCKER_SEARCH_DIRS=(
     "$HOME/workspaces/ros2-docker/dockerfiles/common"
     "$HOME/workspaces/ros2-docker/dockerfiles/isaac_ros_jp6"
