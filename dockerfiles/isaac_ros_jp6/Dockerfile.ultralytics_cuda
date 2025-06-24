@@ -1,20 +1,22 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
-# Tested with JetPack 6.1 (on 22 May 2025)
+# Tested with JetPack 6.1 (on 25 Jun 2025)
 # Reference: https://docs.ultralytics.com/guides/nvidia-jetson/#run-on-jetpack-61
 
 # --no-deps to not override torch installed in Isaac ROS containers
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --no-deps  \
-    ultralytics
+    ultralytics \
+    ultralytics-thop
 
 # Dependencies for ultralytics excluding torch and torchvision
-# Obtained from "pip show ultralytics" + "onnxslim" for exporting of models
+# Obtained from "pip show ultralytics" + "onnxslim" and "onnx" for exporting of models
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
     matplotlib \
     numpy \
+    "onnx<1.18" \
     onnxslim \
     opencv-python \
     pandas \
@@ -24,8 +26,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pyyaml \
     requests \
     scipy \
-    tqdm \
-    ultralytics-thop
+    tqdm
 
 # torchvision and onnxruntime_gpu
 RUN --mount=type=cache,target=/root/.cache/pip \
