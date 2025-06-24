@@ -34,9 +34,8 @@ RUN cat /tmp/.bashrc >> /home/${USERNAME}/.bashrc \
     && cat /tmp/.bashrc >> /root/.bashrc \
     && rm /tmp/.bashrc
 
-# Tmux and tmuxp
+# Tmux
 COPY environments/common/.tmux.conf \
-    ${LOCAL_ENV_FOLDER}/.tmuxp.yaml \
     /home/${USERNAME}/
 
 # Entrypoint scripts
