@@ -1,5 +1,6 @@
-opencv-contrib-python
 imutils
 kornia
-typer
+lap
+opencv-contrib-python
 supervision
+typer
