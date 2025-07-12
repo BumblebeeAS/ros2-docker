@@ -1,6 +1,13 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
+# OpenCV is required by ultralytics
+# But OpenCV 4.12 requires "numpy<2.3.0,>=2", which is not compatible with ROS packages
+# So we install an older version of OpenCV
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install \
+    "opencv-python<4.12"
+
 # As of 15 June 2025, the versions of the other dependencies required
 # by ultralytics match the packages installed in the x86_64 image.
 # "onnx<1.18" for model export.
