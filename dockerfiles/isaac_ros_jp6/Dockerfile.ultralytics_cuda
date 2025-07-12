@@ -12,13 +12,15 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # Dependencies for ultralytics excluding torch and torchvision
 # Obtained from "pip show ultralytics" + "onnxslim" and "onnx" for exporting of models
+# OpenCV 4.12 requires "numpy<2.3.0,>=2", which is not compatible with ROS packages
+# So we install an older version of OpenCV
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
     matplotlib \
-    numpy \
+    "numpy<2" \
     "onnx<1.18" \
     onnxslim \
-    opencv-python \
+    "opencv-python<4.12" \
     pandas \
     pillow \
     psutil \
