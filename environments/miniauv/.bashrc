@@ -1,0 +1,1 @@
+echo "Using miniauv config"
