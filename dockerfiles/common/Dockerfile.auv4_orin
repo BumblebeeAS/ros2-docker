@@ -51,6 +51,7 @@ RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install -U transforms3d
 
+RUN echo "Updated 2025-08-05"
 COPY ${LOCAL_ENV_FOLDER}/rosdep-apt.list \
     ${LOCAL_ENV_FOLDER}/rosdep-pip.list \
     /tmp/
