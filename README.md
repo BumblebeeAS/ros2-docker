@@ -156,19 +156,16 @@ cd ${ISAAC_ROS_WS}/src && \
 
 2. Choose or create an environment in the `environments` folder.
 
-3. Create copies and symbolic links for the required config files and scripts.
+3. Create copies and symbolic links for the required config files and scripts by running the `setup_env_paths.sh` script.
 
-By default, the path to this directory is `$HOME/workspaces/ros2-docker`. Replace it below with the path to this directory if yours is different.
+```bash
+./scripts/setup_env_paths.sh <environment_name>
+```
 
 For example, for the `auv4_orin` environment:
 
 ```bash
-export SOURCE_DIRECTORY=$HOME/workspaces/ros2-docker/
-export ENVIRONMENT_NAME=auv4_orin
-ln -sf $SOURCE_DIRECTORY/environments/$ENVIRONMENT_NAME/.isaac_ros_common-config   ~/.isaac_ros_common-config
-ln -sf $SOURCE_DIRECTORY/run_dev.sh                 ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/run_dev.sh
-unset SOURCE_DIRECTORY
-unset ENVIRONMENT_NAME
+./scripts/setup_env_paths.sh auv4_orin
 ```
 
 4. Build the docker images.
