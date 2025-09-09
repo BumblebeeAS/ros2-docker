@@ -1,29 +1,63 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
-# Additional dependencies for the ROS2 packages px4_msgs and px4_msg_converter
+# Apt packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-  apt-get update -y || true && \
-  apt-get install -y \
-  tmux \
-  tmuxinator \
-  usbutils 
+    apt-get update && apt-get install -y \
+    iproute2 \
+    ncdu \
+    ros-humble-foxglove-bridge \
+    speedtest-cli \
+    tmux
 
-# Needed for bb_localization and state machine
-RUN python3 -m pip install -U \
-  pygeodesy \
-  python-statemachine
+# Pip packages
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install \
+    tmuxp \
+    colcon-clean
 
-# Folder for scripts
-ARG SCRIPTS_DIR=/usr/local/bin/scripts/
-RUN mkdir -p $SCRIPTS_DIR
-# Script to install ROS dependencies
-COPY scripts/rosdep-all.sh $SCRIPTS_DIR
+# Bash profile
+# For bash login shells, ~/.profile -> ~/.bashrc -> ~/.bash_aliases
+RUN mkdir -p /home/${USERNAME}
+# /etc/skel contains default config files for new users
+RUN cp /etc/skel/.profile /home/${USERNAME}/.profile \
+    && cp /etc/skel/.bashrc /home/${USERNAME}/.bashrc
+
+ARG LOCAL_ENV_FOLDER=environments/auv4_orin
+
+COPY ${LOCAL_ENV_FOLDER}/.bash_aliases /home/${USERNAME}/.bash_aliases
+COPY ${LOCAL_ENV_FOLDER}/.bashrc /tmp/.bashrc
+
+# Append to .bashrc in $HOME for user's bash login shells
+# Append to .bashrc in root for VSCode linting
+RUN cat /tmp/.bashrc >> /home/${USERNAME}/.bashrc \
+    && cat /tmp/.bashrc >> /root/.bashrc \
+    && rm /tmp/.bashrc
+
 # Entrypoint scripts
-COPY scripts/drone-docker-dev-entrypoint.sh $SCRIPTS_DIR
-COPY scripts/drone-docker-main-entrypoint.sh $SCRIPTS_DIR
-# Bash read command
-COPY scripts/drone.bashrc $SCRIPTS_DIR
-# Bash aliases
-COPY scripts/drone.bash_aliases $SCRIPTS_DIR
-RUN chmod +x $SCRIPTS_DIR/*.sh
+COPY ${LOCAL_ENV_FOLDER}/on_entry.sh /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
+RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
+
+# Install ROS dependencies
+
+# The apt-packaged version of transforms3d is old, pip install transforms3d
+# separately before installing tf_transformations via apt to avoid errors from pip
+# uninstalling packages installed by distutils.
+# See https://github.com/matthew-brett/transforms3d/issues/65
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install -U transforms3d
+
+# Change the date below to refresh the docker build cache when needed
+RUN echo "Updated 2025-09-10"
+COPY ${LOCAL_ENV_FOLDER}/rosdep-apt.list \
+    ${LOCAL_ENV_FOLDER}/rosdep-pip.list \
+    /tmp/
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && xargs -a /tmp/rosdep-apt.list apt-get install -y \
+    && rm /tmp/rosdep-apt.list
+RUN --mount=type=cache,target=/root/.cache/pip \
+    xargs -a /tmp/rosdep-pip.list pip3 install -U \
+    && rm /tmp/rosdep-pip.list
+
+# Terminal color
+ENV TERM=xterm-256color
