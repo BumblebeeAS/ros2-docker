@@ -1,6 +1,13 @@
+python3-pytest
+python3-opencv
+ros-humble-ament-clang-format
+ros-humble-foxglove-msgs
+ros-humble-image-proc
+ros-humble-tf-transformations
 ros-humble-robot-localization
 ros-humble-geographic-msgs
-python3-pytest
+ros-humble-isaac-ros-common
+ros-humble-isaac-ros-argus-camera
 ros-humble-isaac-ros-test
 ros-humble-isaac-ros-tensor-rt
 ros-humble-isaac-ros-dnn-image-encoder
@@ -8,10 +15,5 @@ ros-humble-isaac-ros-nitros
 ros-humble-isaac-ros-managed-nitros
 ros-humble-isaac-ros-tensor-list-interfaces
 ros-humble-isaac-ros-nitros-tensor-list-type
-python3-opencv
-ros-humble-isaac-ros-common
-ros-humble-ament-clang-format
 ros-humble-isaac-ros-nitros-image-type
 ros-humble-isaac-ros-nitros-camera-info-type
-ros-humble-foxglove-msgs
-ros-humble-tf-transformations
