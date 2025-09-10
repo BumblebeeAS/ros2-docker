@@ -1,30 +1,30 @@
-# Isaac ROS Docker
+# Isaac ROS Docker <!-- omit from toc -->
 
 A set of scripts to ease development with [Isaac ROS Docker containers](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_common/index.html).
 
-- [Isaac ROS Docker](#isaac-ros-docker)
-  - [Installation](#installation)
-    - [Installation on SBC](#installation-on-sbc)
-      - [Install Jetpack](#install-jetpack)
-      - [Install Docker](#install-docker)
-      - [Add Docker to User Group](#add-docker-to-user-group)
-      - [Jetson Setup for VPI](#jetson-setup-for-vpi)
-      - [Setup Isaac ROS](#setup-isaac-ros)
-      - [Jetson Clocks (Optional)](#jetson-clocks-optional)
-      - [Add Authorized SSH Keys (Optional)](#add-authorized-ssh-keys-optional)
-    - [Installation on local computer](#installation-on-local-computer)
-  - [Build Isaac ROS Docker Image](#build-isaac-ros-docker-image)
-  - [Production](#production)
-  - [ROS Dependencies](#ros-dependencies)
-  - [Notes](#notes)
-    - [TODO](#todo)
-    - [Issues](#issues)
-      - [Husarnet](#husarnet)
-      - [Jetson Clocks](#jetson-clocks)
-      - [ZED](#zed)
-      - [Permission Issues with FLIR](#permission-issues-with-flir)
-      - [Permission Issues (General)](#permission-issues-general)
-      - [Docker Max Depth Exceeded](#docker-max-depth-exceeded)
+- [Installation](#installation)
+  - [Installation on SBC](#installation-on-sbc)
+    - [Install Jetpack](#install-jetpack)
+    - [Install Docker](#install-docker)
+    - [Add Docker to User Group](#add-docker-to-user-group)
+    - [Jetson Setup for VPI](#jetson-setup-for-vpi)
+    - [Setup Isaac ROS](#setup-isaac-ros)
+    - [Jetson Clocks (Optional)](#jetson-clocks-optional)
+    - [Add Authorized SSH Keys (Optional)](#add-authorized-ssh-keys-optional)
+  - [Installation on local computer](#installation-on-local-computer)
+- [Build Isaac ROS Docker Image](#build-isaac-ros-docker-image)
+- [Production](#production)
+- [ROS Dependencies](#ros-dependencies)
+- [Notes](#notes)
+  - [TODO](#todo)
+  - [Issues](#issues)
+    - [Husarnet](#husarnet)
+    - [Jetson Clocks](#jetson-clocks)
+    - [ZED](#zed)
+    - [Permission Issues with FLIR](#permission-issues-with-flir)
+    - [Permission Issues (General)](#permission-issues-general)
+    - [Docker Max Depth Exceeded](#docker-max-depth-exceeded)
+    - [OCI runtime error](#oci-runtime-error)
 
 ## Installation
 
@@ -259,3 +259,13 @@ Directories / files created by Dockerfiles and helper scripts run in root as wel
 #### Docker Max Depth Exceeded
 
 As of 31 May 2025, having too many image layers will result in a `docker: Error response from daemon: max depth exceeded` error. The maximum number of image layers seems to be 208 (run `docker history <image_name> | wc -l` to check).
+
+#### OCI runtime error
+
+If you see the following error even after running [Jetson Setup for VPI](#jetson-setup-for-vpi):
+
+```bash
+docker: Error response from daemon: failed to create task for container: failed to create shim task: OCI runtime create failed: could not apply required modification to OCI specification: error modifying OCI spec: failed to inject CDI devices: failed to inject devices: failed to stat CDI host device "/dev/fb0": no such file or directory: unknown
+```
+
+Just re-run the commands in [Jetson Setup for VPI](#jetson-setup-for-vpi) and try again.
