@@ -1,15 +1,17 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
-####################################
-#   Install Micro-XRCE-DDS-Agent   #
-####################################
-WORKDIR /home/
-RUN git config --global http.postBuffer 524288000 && \
-git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
-WORKDIR /home/Micro-XRCE-DDS-Agent/
-RUN mkdir build 
-WORKDIR /home/Micro-XRCE-DDS-Agent/build
-RUN cmake ..
-RUN make
-RUN make install
+# Source: https://docs.px4.io/main/en/middleware/uxrce_dds.html#starting-the-client
+# Note that we use the latest 2.x version, v2.4.3, but the listed v2.4.2 in the linked webpage should be fine too.
+# Note that the PX4 Micro XRCE-DDS Client is not compatible with the v3.x Agent version 
+# See: https://docs.px4.io/main/en/middleware/uxrce_dds.html#micro-xrce-dds-agent-installation
+
+WORKDIR /workspaces
+RUN git clone -b v2.4.3 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git \
+    && cd Micro-XRCE-DDS-Agent \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+    && make \
+    && make install \
+    && ldconfig /usr/local/lib/
