@@ -1,0 +1,7 @@
+imutils
+kornia
+lap
+opencv-contrib-python<4.12
+pygeodesy
+supervision
+typer
