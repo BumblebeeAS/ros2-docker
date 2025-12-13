@@ -2,7 +2,7 @@ BUILD_IMAGE_FLAG=1
 
 # These parameters are only relevant if BUILD_IMAGE_FLAG=1
 # CuDNN is in the Isaac ROS x86_64 image but not in the JP6 image for some reason.
-CONFIG_IMAGE_KEY=ros2_humble.ultralytics_cuda.micro_xrce_dds_agent.ccache.drone_sim
+CONFIG_IMAGE_KEY=ros2_humble.trt.ultralytics_cuda.micro_xrce_dds_agent.ccache.drone_sim
 CONFIG_DOCKER_SEARCH_DIRS=(
     "$HOME/workspaces/ros2-docker/dockerfiles/common"
     "$HOME/workspaces/ros2-docker/dockerfiles/isaac_ros_x64"

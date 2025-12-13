@@ -1,7 +1,8 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --upgrade pip && \
-    pip install wheel && \
-    pip install --upgrade tensorrt
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && apt-get install -y \
+    python3-libnvinfer=10.3.0.26-1+cuda12.5 \
+    python3-libnvinfer-lean=10.3.0.26-1+cuda12.5 \
+    python3-libnvinfer-dispatch=10.3.0.26-1+cuda12.5
