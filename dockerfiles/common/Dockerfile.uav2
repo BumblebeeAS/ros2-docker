@@ -23,7 +23,7 @@ RUN mkdir -p /home/${USERNAME}
 RUN cp /etc/skel/.profile /home/${USERNAME}/.profile \
     && cp /etc/skel/.bashrc /home/${USERNAME}/.bashrc
 
-ARG LOCAL_ENV_FOLDER=environments/drone
+ARG LOCAL_ENV_FOLDER=environments/uav2
 
 COPY ${LOCAL_ENV_FOLDER}/.bash_aliases /home/${USERNAME}/.bash_aliases
 COPY ${LOCAL_ENV_FOLDER}/.bashrc /tmp/.bashrc
