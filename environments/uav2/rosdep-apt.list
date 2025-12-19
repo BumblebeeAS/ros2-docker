@@ -3,6 +3,8 @@ python3-opencv
 ros-humble-ament-clang-format
 ros-humble-foxglove-msgs
 ros-humble-image-proc
+ros-humble-py-trees
+ros-humble-py-trees-ros
 ros-humble-tf-transformations
 ros-humble-robot-localization
 ros-humble-geographic-msgs
