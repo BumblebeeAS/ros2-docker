@@ -1,6 +1,8 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
+# Adapted from https://github.com/Dronecode/roscon-25-workshop/blob/main/docker/scripts/build_px4.sh and https://github.com/PX4/PX4-Autopilot/blob/main/Tools/setup/ubuntu.sh
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     wget \
@@ -33,7 +35,6 @@ RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyri
     shellcheck \
     unzip \
     zip \
-    # --- Simulation (Gazebo Harmonic & GStreamer) ---
     gz-harmonic \
     bc \
     dmidecode \
@@ -47,9 +48,6 @@ RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyri
     libimage-exiftool-perl \
     libopencv-dev \
     protobuf-compiler \
-    # --- Vital Tool for SITL ROMFS ---
-    # Note: The script lists this under NuttX, but SITL often needs it for ROMFS generation.
-    # We include it to be safe, as it's very small.
     genromfs \
     && rm -rf /var/lib/apt/lists/*
 
@@ -60,7 +58,7 @@ RUN curl -s https://raw.githubusercontent.com/PX4/PX4-Autopilot/${PX4_VERSION}/T
     rm /tmp/requirements.txt
 
 WORKDIR /home/${USERNAME}
-
+# Adapted from https://github.com/PX4/PX4-Autopilot/issues/25859
 RUN git clone --recurse-submodules -b fix/startup-script-aliases https://github.com/nzlz/PX4-Autopilot.git
 WORKDIR /home/${USERNAME}/PX4-Autopilot
 
