@@ -143,6 +143,8 @@ Follow https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute
 and https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html to set up
 Isaac ROS docker dev environment.
 
+Alternatively, use `scripts/install_dev_env_x86.sh`.
+
 ## Build Isaac ROS Docker Image
 
 1. Clone `isaac_ros_common`.
