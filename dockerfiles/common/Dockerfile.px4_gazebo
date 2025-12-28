@@ -32,3 +32,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN make px4_sitl_default
 
 RUN chown -R 1000:1000 /home/${USERNAME}/PX4-Autopilot
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y \
+    ros-humble-ros-gzharmonic-bridge
