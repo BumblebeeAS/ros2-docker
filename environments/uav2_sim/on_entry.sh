@@ -22,5 +22,7 @@ ln -sf $(realpath ${ETC_DIR}/model.config) ${PX4_AUTOPILOT_MODEL_DIR}
 ln -sf $(realpath ${ETC_DIR}/5000_gz_uav2) ${PX4_AUTOPILOT_AIRFRAMES_DIR}
 ln -sf $(realpath ${WORLDS_DIR}/robotx_2024_aruco.sdf) ${PX4_AUTOPILOT_GZ_DIR}/worlds
 
-sed -i '/4021_gz_x500_flow/a \ \t5000_gz_uav2' \
-    ${PX4_AUTOPILOT_AIRFRAMES_DIR}/CMakeLists.txt
+if ! grep -q '5000_gz_uav2' "${PX4_AUTOPILOT_AIRFRAMES_DIR}/CMakeLists.txt"; then
+    sed -i '/4021_gz_x500_flow/a \ \t5000_gz_uav2' \
+        "${PX4_AUTOPILOT_AIRFRAMES_DIR}/CMakeLists.txt"
+fi
