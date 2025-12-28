@@ -31,4 +31,4 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 RUN make px4_sitl_default
 
-RUN chown -R 1000:1000 /home/${USERNAME}/PX4-Autopilot/build
+RUN chown -R 1000:1000 /home/${USERNAME}/PX4-Autopilot
