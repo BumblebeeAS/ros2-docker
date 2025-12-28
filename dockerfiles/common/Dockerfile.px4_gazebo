@@ -1,0 +1,39 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+WORKDIR /home/${USERNAME}
+RUN git clone --recurse-submodules -b v1.16.0 \
+    https://github.com/PX4/PX4-Autopilot.git
+
+WORKDIR /home/${USERNAME}/PX4-Autopilot
+
+# See https://github.com/PX4/PX4-Autopilot/issues/25859
+RUN curl -L \
+    https://github.com/nzlz/PX4-Autopilot/commit/11f62aad6709ba16c3f55788dd1cb12bba9f2ed8.patch \
+    | git apply
+
+# Remove existing protobuf installation and
+# use the one in the PX4 install script
+RUN rm -rf \
+    /usr/local/include/google/protobuf \
+    /usr/local/lib/libprotobuf* /usr/local/lib/libprotoc* \
+    /usr/local/lib64/libprotobuf* /usr/local/lib64/libprotoc* \
+    /usr/local/lib/cmake/protobuf \
+    /usr/local/lib/pkgconfig/protobuf*.pc \
+    /usr/local/share/pkgconfig/protobuf*.pc \
+    /usr/local/bin/protoc* \
+    && ldconfig
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    --mount=type=cache,target=/root/.cache/pip \
+    ./Tools/setup/ubuntu.sh
+
+RUN make px4_sitl_default
+
+RUN chown -R 1000:1000 /home/${USERNAME}/PX4-Autopilot
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y \
+    ros-humble-ros-gzharmonic-bridge
