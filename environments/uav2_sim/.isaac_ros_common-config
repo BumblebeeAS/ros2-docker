@@ -14,7 +14,6 @@ BUILT_IMAGE=isaac_ros_dev-aarch64:latest
 # Note that env variables like $HOME cannot be unpacked here
 MOUNT_DIRS=(
     "$HOME/workspaces/isaac_ros-dev:/workspaces/isaac_ros-dev"
-    "$HOME//workspaces/uav2_sim:/home/admin/colcon_ws"
     "$HOME/.cache/ccache:/home/admin/.cache/ccache"
     "$HOME/.cache/torch:/home/admin/.cache/torch" 
     "$HOME/.cache/matplotlib:/home/admin/.cache/matplotlib"
