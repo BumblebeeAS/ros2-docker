@@ -24,10 +24,15 @@ RUN rm -rf \
     /usr/local/bin/protoc* \
     && ldconfig
 
+# Somehow pip installing kconfiglib in the Dockerfile does not work,
+# (although the same pip install in the build Docker container is fine).
+# So, we apt install kconfiglib even though it is pip installed in the script.
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     --mount=type=cache,target=/root/.cache/pip \
-    ./Tools/setup/ubuntu.sh
+    ./Tools/setup/ubuntu.sh \
+    && apt-get update && apt-get install -y \
+    python3-kconfiglib
 
 RUN make px4_sitl_default
 
