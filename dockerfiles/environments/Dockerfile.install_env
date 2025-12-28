@@ -23,8 +23,6 @@ RUN mkdir -p /home/${USERNAME}
 RUN cp /etc/skel/.profile /home/${USERNAME}/.profile \
     && cp /etc/skel/.bashrc /home/${USERNAME}/.bashrc
 
-ARG LOCAL_ENV_FOLDER=environments/uav2_sim
-
 COPY ${LOCAL_ENV_FOLDER}/.bash_aliases /home/${USERNAME}/.bash_aliases
 COPY ${LOCAL_ENV_FOLDER}/.bashrc /tmp/.bashrc
 
@@ -48,7 +46,6 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install -U transforms3d
 
 # Change the date below to refresh the docker build cache when needed
-RUN echo "Updated 2025-09-10"
 COPY ${LOCAL_ENV_FOLDER}/rosdep-apt.list \
     ${LOCAL_ENV_FOLDER}/rosdep-pip.list \
     /tmp/
@@ -61,3 +58,6 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # Terminal color
 ENV TERM=xterm-256color
+
+# Tmux configuration
+COPY environments/common/.tmux.conf /home/${USERNAME}/.tmux.conf
