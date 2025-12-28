@@ -1,105 +1,34 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
-# Adapted from https://github.com/Dronecode/roscon-25-workshop/blob/main/docker/scripts/build_px4.sh and https://github.com/PX4/PX4-Autopilot/blob/main/Tools/setup/ubuntu.sh
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    wget \
-    curl \
-    gnupg \
-    lsb-release \
-    software-properties-common \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null && \
-    apt-get update && \
-    rm -rf /usr/local/include/google/protobuf \
-           /usr/local/lib/libprotobuf* \
-           /usr/local/lib/libprotoc* \
-           /usr/local/lib/cmake/protobuf \
-           /usr/local/lib/pkgconfig/protobuf.pc \
-           /usr/local/bin/protoc* && \    
-    apt-get install -y --no-install-recommends \
-    astyle \
-    build-essential \
-    lcov \
-    libssl-dev \
-    libxml2-dev \
-    libxml2-utils \
-    make \
-    python3-wheel \
-    rsync \
-    shellcheck \
-    unzip \
-    zip \
-    gz-harmonic \
-    bc \
-    dmidecode \
-    gstreamer1.0-plugins-bad \
-    gstreamer1.0-plugins-base \
-    gstreamer1.0-plugins-good \
-    gstreamer1.0-plugins-ugly \
-    gstreamer1.0-libav \
-    libeigen3-dev \
-    libgstreamer-plugins-base1.0-dev \
-    libimage-exiftool-perl \
-    libopencv-dev \
-    protobuf-compiler \
-    genromfs \
-    && rm -rf /var/lib/apt/lists/*
-
-
-ARG PX4_VERSION=v1.16.0
-RUN curl -s https://raw.githubusercontent.com/PX4/PX4-Autopilot/${PX4_VERSION}/Tools/setup/requirements.txt -o /tmp/requirements.txt && \
-    pip3 install --no-cache-dir --break-system-packages -r /tmp/requirements.txt && \
-    rm /tmp/requirements.txt
-
 WORKDIR /home/${USERNAME}
-# Adapted from https://github.com/PX4/PX4-Autopilot/issues/25859
-RUN git clone --recurse-submodules -b fix/startup-script-aliases https://github.com/nzlz/PX4-Autopilot.git
+RUN git clone --recurse-submodules -b v1.16.0 \
+    https://github.com/PX4/PX4-Autopilot.git
+
 WORKDIR /home/${USERNAME}/PX4-Autopilot
 
-RUN git apply - <<'EOF'
-diff --git a/ROMFS/px4fmu_common/init.d-posix/rcS b/ROMFS/px4fmu_common/init.d-posix/rcS
-index fed292b9d1..1d34854077 100644
---- a/ROMFS/px4fmu_common/init.d-posix/rcS
-+++ b/ROMFS/px4fmu_common/init.d-posix/rcS
-@@ -126,15 +126,6 @@ then
- 	set AUTOCNF yes
- fi
- 
--# Allow overriding parameters via env variables: export PX4_PARAM_{name}={value}
--env | while IFS='=' read -r line; do
--  value=${line#*=}
--  name=${line%%=*}
--  case $name in
--    "PX4_PARAM_"*) param set "${name#PX4_PARAM_}" "$value" ;;
--  esac
--done
--
- # multi-instance setup
- # shellcheck disable=SC2154
- param set MAV_SYS_ID $((px4_instance+1))
-@@ -239,6 +230,15 @@ then
- 	exit 1
- fi
- 
-+# Allow overriding parameters via env variables: export PX4_PARAM_{name}={value}
-+env | while IFS='=' read -r line; do
-+  value=${line#*=}
-+  name=${line%%=*}
-+  case $name in
-+    "PX4_PARAM_"*) param set "${name#PX4_PARAM_}" "$value" ;;
-+  esac
-+done
-+
- dataman start
- 
- # only start the simulator if not in replay mode, as both control the lockstep time
-EOF
+# See https://github.com/PX4/PX4-Autopilot/issues/25859
+RUN curl -L \
+    https://github.com/nzlz/PX4-Autopilot/commit/11f62aad6709ba16c3f55788dd1cb12bba9f2ed8.patch \
+    | git apply
+
+# Remove existing protobuf installation and
+# use the one in the PX4 install script
+RUN rm -rf \
+    /usr/local/include/google/protobuf \
+    /usr/local/lib/libprotobuf* /usr/local/lib/libprotoc* \
+    /usr/local/lib64/libprotobuf* /usr/local/lib64/libprotoc* \
+    /usr/local/lib/cmake/protobuf \
+    /usr/local/lib/pkgconfig/protobuf*.pc \
+    /usr/local/share/pkgconfig/protobuf*.pc \
+    /usr/local/bin/protoc* \
+    && ldconfig
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    --mount=type=cache,target=/root/.cache/pip \
+    ./Tools/setup/ubuntu.sh
 
 RUN make px4_sitl_default
-RUN sed -i '/4021_gz_x500_flow/a \ \t5000_gz_uav2' /home/${USERNAME}/PX4-Autopilot/ROMFS/px4fmu_common/init.d-posix/airframes/CMakeLists.txt
+
+RUN chown -R 1000:1000 /home/${USERNAME}/PX4-Autopilot/build
