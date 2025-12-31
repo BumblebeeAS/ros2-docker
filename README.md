@@ -183,6 +183,8 @@ By default, file changes (except in the mounted workspaces) and installations in
 
 Then, you can set the `BUILD_IMAGE_FLAG=0` in `.isaac_ros_common-config` (in the environment directory) and set `BUILT_IMAGE` to the image tag. This runs the built image instead of building a new image each time when starting the container.
 
+**NOTE**: `BUILD_IMAGE_FLAG=1` does not behave well when launching multiple instances of the container at the same time (e.g., using `tmuxp`). Recommended workflow is to build the container separately, set `BUILD_IMAGE_FLAG=0` and then launch the `tmuxp` session(s).
+
 ## ROS Dependencies
 
 Run the following command in your ROS workspace to generate a list of `apt` packages required.
