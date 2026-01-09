@@ -45,7 +45,6 @@ RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install -U transforms3d
 
-# Change the date below to refresh the docker build cache when needed
 COPY ${LOCAL_ENV_FOLDER}/rosdep-apt.list \
     ${LOCAL_ENV_FOLDER}/rosdep-pip.list \
     /tmp/
@@ -60,4 +59,5 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 ENV TERM=xterm-256color
 
 # Tmux configuration
-COPY environments/common/.tmux.conf /home/${USERNAME}/.tmux.conf
+COPY environments/common/.tmux.conf \
+    /home/${USERNAME}/
