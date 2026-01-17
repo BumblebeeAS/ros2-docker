@@ -8,19 +8,29 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   qtbase5-dev \
   qtchooser \
   qt5-qmake \
-  qtbase5-dev-tools 
+  qtbase5-dev-tools
 
 # Download and install Spinnaker SDK
 # Change the URL to the latest version if needed
-RUN wget -qO- https://flir.netx.net/file/asset/68257/original/attachment/spinnaker-4.2.0.21-arm64-pkg.tar.gz | tar xvz
+RUN wget -qO- https://flir.netx.net/file/asset/73905/original/attachment | tar xvz
 
-WORKDIR /spinnaker-4.2.0.21-arm64
+WORKDIR /spinnaker-4.3.0.189-arm64
 
-# Skip the EULA agreement prompt, which cannot be bypassed by pressing Enter.
-RUN echo "libgentl libspinnaker/accepted-flir-eula boolean true" | debconf-set-selections
+# Skip the EULA agreement and analytics prompts, which cannot be bypassed by pressing Enter.
+# Get the keys from `debconf-show libgentl`
+RUN apt-get update && apt-get install -y debconf-utils && \
+  debconf-set-selections <<'EOF'
+libgentl libspinnaker/accepted-flir-eula boolean true
+libgentl libspinnaker/analytics-consent boolean false
+EOF
 
-# When running the install script, send a stream of empty strings, which effectively simulates pressing Enter repeatedly.
-RUN yes "" | ./install_spinnaker_arm.sh
+# Source: install_spinnaker_arm.sh
+# TODO: groupadd -f flirimaging && usermod -a -G flirimaging ${USERNAME} in configure_spinnaker.sh
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y ./*.deb && \
+  yes "" | sh configure_spinnaker.sh && \
+  sh configure_usbfs.sh && \
+  sh configure_spinnaker_paths.sh && \
+  sh configure_gentl_paths.sh 64
 
 # Running with Xephyr fixes flickering issue when running SpinView
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
