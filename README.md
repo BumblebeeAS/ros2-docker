@@ -158,7 +158,7 @@ cd ${ISAAC_ROS_WS}/src && \
 
 2. Choose or create an environment in the `environments` folder.
 
-3. Create copies and symbolic links for the required config files and scripts by running the `setup_env_paths.sh` script.
+3. Create copies and symbolic links for the required config files and scripts by running the `setup_env_paths.sh` script in this repository.
 
 ```bash
 ./scripts/setup_env_paths.sh <environment_name>
