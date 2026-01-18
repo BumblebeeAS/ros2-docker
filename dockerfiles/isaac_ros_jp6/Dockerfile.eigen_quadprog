@@ -1,0 +1,16 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  apt-get update && apt-get install -y --no-install-recommends \
+  git cmake build-essential pkg-config libeigen3-dev
+
+RUN git clone --recursive https://github.com/jrl-umi3218/eigen-quadprog /tmp/eigen-quadprog && \
+  cd /tmp/eigen-quadprog && \
+  mkdir -p _build && \
+  cd _build && \
+  cmake [options] .. && \
+  make -j"$(nproc)" && \
+  make install && \
+  ldconfig && \
+  rm -rf /tmp/eigen-quadprog
