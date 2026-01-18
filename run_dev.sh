@@ -194,6 +194,12 @@ fi
 
 # Re-use existing container.
 if [ "$(docker ps -a --quiet --filter status=running --filter name=$CONTAINER_NAME)" ]; then
+    # If we're not in an interactive terminal (e.g., systemd), don't try to attach.
+    if [ ! -t 0 ]; then
+        print_info "Container already running: $CONTAINER_NAME (non-interactive, skipping attach)"
+        exit 0
+    fi
+
     print_info "Attaching to running container: $CONTAINER_NAME"
     docker exec -i -t -u admin ${DOCKER_ARGS[@]} $CONTAINER_NAME /bin/bash $@
     exit 0
