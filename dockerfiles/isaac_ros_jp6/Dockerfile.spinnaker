@@ -18,7 +18,8 @@ WORKDIR /spinnaker-4.3.0.189-arm64
 
 # Skip the EULA agreement and analytics prompts, which cannot be bypassed by pressing Enter.
 # Get the keys from `debconf-show libgentl`
-RUN apt-get update && apt-get install -y debconf-utils && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  apt-get update && apt-get install -y debconf-utils && \
   debconf-set-selections <<'EOF'
 libgentl libspinnaker/accepted-flir-eula boolean true
 libgentl libspinnaker/analytics-consent boolean false
@@ -26,7 +27,8 @@ EOF
 
 # Source: install_spinnaker_arm.sh
 # TODO: groupadd -f flirimaging && usermod -a -G flirimaging ${USERNAME} in configure_spinnaker.sh
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y ./*.deb && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y ./*.deb && \
   yes "" | sh configure_spinnaker.sh && \
   sh configure_usbfs.sh && \
   sh configure_spinnaker_paths.sh && \
