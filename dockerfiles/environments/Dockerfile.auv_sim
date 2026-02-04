@@ -1,0 +1,7 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+ENV LOCAL_ENV_FOLDER=environments/auv_sim
+
+# Change the date below to refresh the docker build cache when needed
+RUN echo "Updated 2026-02-4"
