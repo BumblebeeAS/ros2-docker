@@ -1,0 +1,29 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] https://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+
+# outdated key will cause apt update to fail
+# see https://github.com/alshedivat/al-folio/issues/3487
+RUN rm -f /etc/apt/sources.list.d/yarn.list
+
+RUN rm -rf \ 
+           /usr/local/include/google/protobuf \
+           /usr/local/lib/libprotobuf* \
+           /usr/local/lib/libprotoc* \
+           /usr/local/lib/cmake/protobuf \
+           /usr/local/lib/pkgconfig/protobuf.pc \
+           /usr/local/bin/protoc* 
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y \
+    gz-harmonic ros-humble-ros-gzharmonic
+
+WORKDIR /home/${USERNAME}
+
+# Install protoc 3.12.4 for aarch64 which is the container env
+RUN curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.12.4/protoc-3.12.4-linux-aarch_64.zip && \
+        unzip protoc-3.12.4-linux-aarch_64.zip -d /usr/local && \
+        rm protoc-3.12.4-linux-aarch_64.zip
