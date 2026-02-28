@@ -1,0 +1,92 @@
+# Added a default value to fix the "InvalidDefaultArgInFrom" warning
+ARG BASE_IMAGE=ubuntu:22.04
+FROM $BASE_IMAGE
+
+ARG PX4_VERSION=v1.16.0
+
+# kconfiglib pip install fails in Dockerfile context; must use apt
+# ros-humble-ros-gzharmonic-bridge enables PX4 <-> Gazebo Harmonic transport
+# --> ADDED 'patch' TO THIS LIST <--
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y \
+    curl \
+    python3-kconfiglib \
+    ros-humble-ros-gzharmonic-bridge \
+    patch
+
+# Clone, patch, and build PX4 SITL
+# ubuntu.sh calls apt internally so we keep the cache mounts here too
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    <<EOF
+set -eo pipefail
+HOME_DIR=/home/${USERNAME}
+
+git clone --recurse-submodules -b ${PX4_VERSION} \
+    https://github.com/PX4/PX4-Autopilot.git ${HOME_DIR}/PX4-Autopilot
+
+cd ${HOME_DIR}/PX4-Autopilot
+
+# See https://github.com/PX4/PX4-Autopilot/issues/25859
+curl -L \
+    https://github.com/nzlz/PX4-Autopilot/commit/11f62aad6709ba16c3f55788dd1cb12bba9f2ed8.patch \
+    | git apply
+
+# Move PX4_PARAM_* env var processing to after parameter loading so params
+# like PX4_PARAM_UXRCE_DDS_SYNCT are applied after defaults are set.
+# --> CHANGED 'git apply -' to 'patch -p1' <--
+patch -p1 <<'PATCH'
+diff --git a/ROMFS/px4fmu_common/init.d-posix/rcS b/ROMFS/px4fmu_common/init.d-posix/rcS
+index fed292b9d1..1d34854077 100644
+--- a/ROMFS/px4fmu_common/init.d-posix/rcS
++++ b/ROMFS/px4fmu_common/init.d-posix/rcS
+@@ -126,15 +126,6 @@ then
+ 	set AUTOCNF yes
+ fi
+ 
+-# Allow overriding parameters via env variables: export PX4_PARAM_{name}={value}
+-env | while IFS='=' read -r line; do
+-  value=${line#*=}
+-  name=${line%%=*}
+-  case $name in
+-    "PX4_PARAM_"*) param set "${name#PX4_PARAM_}" "$value" ;;
+-  esac
+-done
+-
+ # multi-instance setup
+ # shellcheck disable=SC2154
+ param set MAV_SYS_ID $((px4_instance+1))
+@@ -239,6 +230,15 @@ then
+ 	exit 1
+ fi
+ 
++# Allow overriding parameters via env variables: export PX4_PARAM_{name}={value}
++env | while IFS='=' read -r line; do
++  value=${line#*=}
++  name=${line%%=*}
++  case $name in
++    "PX4_PARAM_"*) param set "${name#PX4_PARAM_}" "$value" ;;
++  esac
++done
++
+ dataman start
+PATCH
+
+./Tools/setup/ubuntu.sh --no-nuttx --no-sim-tools
+
+# The dave_sim layer installs an aarch64 protoc binary to /usr/local/bin/protoc.
+# Remove it so cmake uses the x86_64 protoc installed above by ubuntu.sh.
+rm -f /usr/local/bin/protoc
+
+make -j$(nproc) px4_sitl_default
+
+cd ${HOME_DIR}
+mkdir -p px4_sitl/romfs/etc
+cp -a PX4-Autopilot/build/px4_sitl_default/bin px4_sitl/
+tar xf PX4-Autopilot/build/px4_sitl_default/romfs_files.tar -C px4_sitl/romfs/etc
+EOF
+
+RUN chown -R 1000:1000 \
+    /home/${USERNAME}/px4_sitl \
+    /home/${USERNAME}/PX4-Autopilot
