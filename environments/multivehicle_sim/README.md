@@ -34,7 +34,7 @@ Runs at container startup as the `admin` user. Sets up the PX4 Gazebo model and 
 
 | Variable | Value | Purpose |
 |---|---|---|
-| `GZ_SIM_RESOURCE_PATH` | `…:~/PX4-Autopilot/Tools/simulation/gz/models:/workspaces/uav_ws/install/uav2_description/share` | Allows Gazebo to resolve `model://uav2_description/meshes/…` URIs from the UAV model SDF |
+| `GZ_SIM_RESOURCE_PATH` | `…:~/PX4-Autopilot/Tools/simulation/gz/models | Allows Gazebo to resolve `model://uav2_description/meshes/…` URIs from the UAV model SDF |
 
 `uav2_description` is in `uav_ws`, which is not sourced globally. Without this entry, Gazebo (started by `sim_entrypoint`, not PX4) cannot find UAV mesh files when running the multivehicle sim.
 
@@ -67,3 +67,32 @@ Expected workspace layout on the host:
 ├── auv_ws/           # AUV-specific packages
 └── asv_ws/           # ASV-specific packages
 ```
+## Implementation details
+
+## Key Differences from `uav2_sim`
+
+| | `uav2_sim` | `multivehicle_sim` |
+|---|---|---|
+| PX4 launch | `make px4_sitl gz_uav2` (full PX4-Autopilot) | `px4-sitl` alias (standalone binary) |
+| Gazebo launch | PX4 starts Gazebo | `gz sim` runs separately |
+| Micro XRCE-DDS Agent | Built into Docker layer | Docker layer (`micro_xrce_dds_agent`) |
+| Airframe registration | `PX4-Autopilot/ROMFS/…/airframes/` + CMakeLists edit | `~/px4_sitl/romfs/etc/init.d-posix/airframes/` (no recompile) |
+| Workspace mount | `~/workspaces/isaac_ros-dev` | `~/workspaces` (all vehicle workspaces) |
+
+## Potential problems
+
+### Unclean .bashrc
+Because of PX4, I had to add the directory path to GZ_SIM_RESOURCE_PATH in .bashrc as follows: 
+```bash
+GZ_SIM_RESOURCE_PATH=…:~/PX4-Autopilot/Tools/simulation/gz/models
+```
+There are definitely better ways out there. 
+
+### PX4 SITL 
+The px4_sitl layer is built up on several patches on the exisiting PX4-Autopilot 1.16.0 release. 
+One is from: https://github.com/Dronecode/roscon-25-workshop/blob/main/docker/scripts/build_px4.sh
+Other is from: https://github.com/PX4/PX4-Autopilot/issues/25859#issuecomment-3976481685
+
+Things might changes over time. 
+
+Also there are some dependency management fixes we did with protobuf to make it compatible to dave and also the PX4 build. Take care.
