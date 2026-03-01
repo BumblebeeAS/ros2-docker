@@ -7,6 +7,4 @@ if [ -f /workspaces/isaac_ros-dev/install/setup.bash ]; then
     source /workspaces/isaac_ros-dev/install/setup.bash
 fi
 
-export BB_VEHICLE="auv4"
-
 export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH:$HOME/PX4-Autopilot/Tools/simulation/gz/models
