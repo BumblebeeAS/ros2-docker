@@ -1,4 +1,4 @@
-# multivehicle_sim Environment
+# multivehicle_sim environment
 
 Docker environment for running multi-vehicle Gazebo simulations with standalone PX4 SITL.
 
