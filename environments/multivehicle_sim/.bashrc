@@ -9,5 +9,4 @@ fi
 
 export BB_VEHICLE="auv4"
 
-# PX4 Gazebo model path — allows Gazebo to find PX4 stock models (e.g. x500)
 export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH:$HOME/PX4-Autopilot/Tools/simulation/gz/models
