@@ -3,7 +3,7 @@
 A set of scripts to ease development with [Isaac ROS Docker containers](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_common/index.html).
 
 - [Installation](#installation)
-  - [Installation on SBC](#installation-on-sbc)
+  - [Installation on Jetson](#installation-on-jetson)
     - [Install Jetpack](#install-jetpack)
     - [Install Docker](#install-docker)
     - [Add Docker to User Group](#add-docker-to-user-group)
@@ -30,9 +30,9 @@ A set of scripts to ease development with [Isaac ROS Docker containers](https://
 
 _For ease of installation, save this directory as `~/workspaces/ros2-docker`._
 
-### Installation on SBC
+### Installation on Jetson
 
-Source: https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/index.html
+Source: [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html)
 
 Commands from the above website are pasted below:
 
@@ -73,7 +73,7 @@ Reboot the computer for the changes to take effect.
 
 #### Jetson Setup for VPI
 
-Source: https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/jetson_vpi.html
+Source: [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/jetson_vpi.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/jetson_vpi.html)
 
 ```bash
 sudo nvidia-ctk cdi generate --mode=csv --output=/etc/cdi/nvidia.yaml
@@ -89,7 +89,7 @@ sudo apt-get install -y pva-allow-2
 
 #### Setup Isaac ROS
 
-Source: https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html
+Source: [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html)
 
 Commands from the above website are pasted below:
 
@@ -139,8 +139,8 @@ To avoid keying in the password each time login in via SSH, add the client compu
 
 ### Installation on local computer
 
-Follow https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/index.html
-and https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html to set up
+Follow [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html)
+and [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html) to set up
 Isaac ROS docker dev environment.
 
 Alternatively, use `scripts/install_dev_env_x86.sh`.
