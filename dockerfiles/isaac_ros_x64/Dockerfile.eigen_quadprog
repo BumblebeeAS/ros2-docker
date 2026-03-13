@@ -1,0 +1,7 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  curl -1sLf 'https://dl.cloudsmith.io/public/mc-rtc/stable/setup.deb.sh' | bash && \
+  apt-get update && \
+  apt-get install -y libeigen-quadprog-dev && \
