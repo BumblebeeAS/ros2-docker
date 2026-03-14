@@ -15,9 +15,13 @@ sudo apt-get update
 # Install Docker
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+TARGET_USER="${SUDO_USER:-$USER}"
+
 # Add user to docker group
-sudo usermod -aG docker $USER
-newgrp docker
+sudo usermod -aG docker "$TARGET_USER"
+# Apply docker group membership on next login shell.
+# newgrp does not work in scripts, so we just print a reminder for the user to log out/in or run newgrp manually.
+echo "Docker group updated for $TARGET_USER. Log out/in (or run: newgrp docker) after this script finishes."
 
 # Update drivers for GPU
 sudo ubuntu-drivers install
@@ -49,6 +53,20 @@ sudo apt-get install git-lfs
 git lfs install --skip-repo
 
 # Create workspace
-mkdir -p ~/workspaces/isaac_ros-dev/src
-echo "export ISAAC_ROS_WS=${HOME}/workspaces/isaac_ros-dev/" >>~/.bashrc
-source ~/.bashrc
+TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
+TARGET_BASHRC="$TARGET_HOME/.bashrc"
+EXPORT_LINE='export ISAAC_ROS_WS=$HOME/workspaces/isaac_ros-dev/'
+
+mkdir -p "$TARGET_HOME/workspaces/isaac_ros-dev/src"
+touch "$TARGET_BASHRC"
+
+if ! grep -qxF "$EXPORT_LINE" "$TARGET_BASHRC"; then
+        echo "$EXPORT_LINE" >>"$TARGET_BASHRC"
+        echo "Added ISAAC_ROS_WS to $TARGET_BASHRC"
+else
+        echo "ISAAC_ROS_WS already present in $TARGET_BASHRC"
+fi
+
+# Export for the script runtime; open a new shell or source .bashrc manually for interactive use.
+export ISAAC_ROS_WS="$TARGET_HOME/workspaces/isaac_ros-dev/"
+echo "Run: source $TARGET_BASHRC"
