@@ -67,6 +67,7 @@ _For ease of installation, save this directory as `~/workspaces/ros2-docker`._
 
 <details>
 <summary><strong>Installation on Jetson</strong></summary>
+</br>
 
 Source: [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html)
 
@@ -179,6 +180,7 @@ To avoid keying in the password each time login in via SSH, add the client compu
 
 <details>
 <summary><strong>Installation on x86_64</strong></summary>
+</br>
 
 Follow [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html)
 and [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html) to set up
