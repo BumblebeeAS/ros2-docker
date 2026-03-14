@@ -143,7 +143,13 @@ Follow [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardwar
 and [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html) to set up
 Isaac ROS docker dev environment.
 
-Alternatively, use `scripts/install_dev_env_x86.sh`.
+Alternatively, use `scripts/install_dev_env_x86.sh`, and then run
+
+```bash
+newgrp docker
+```
+
+outside of the script.
 
 ## Build Isaac ROS Docker Image
 
