@@ -6,13 +6,6 @@ A set of scripts to ease development with [Isaac ROS Docker containers](https://
 - [Sample Hardware and OS Requirements](#sample-hardware-and-os-requirements)
 - [Installation](#installation)
   - [Installation on Jetson](#installation-on-jetson)
-    - [Install Jetpack](#install-jetpack)
-    - [Install Docker](#install-docker)
-    - [Add Docker to User Group](#add-docker-to-user-group)
-    - [Jetson Setup for VPI](#jetson-setup-for-vpi)
-    - [Setup Isaac ROS](#setup-isaac-ros)
-    - [Jetson Clocks (Optional)](#jetson-clocks-optional)
-    - [Add Authorized SSH Keys (Optional)](#add-authorized-ssh-keys-optional)
   - [Installation on x86\_64](#installation-on-x86_64)
 - [Build Isaac ROS Docker Image](#build-isaac-ros-docker-image)
 - [Production](#production)
@@ -73,13 +66,13 @@ Source: [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardwa
 
 Commands from the above website are pasted below:
 
-#### Install Jetpack
+#### Install Jetpack <!-- omit from toc -->
 
 ```bash
 sudo apt install nvidia-jetpack
 ```
 
-#### Install Docker
+#### Install Docker <!-- omit from toc -->
 
 ```bash
 # Add Docker's official GPG key:
@@ -99,7 +92,7 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-#### Add Docker to User Group
+#### Add Docker to User Group <!-- omit from toc -->
 
 ```bash
 sudo usermod -aG docker $USER
@@ -108,7 +101,7 @@ newgrp docker
 
 Reboot the computer for the changes to take effect.
 
-#### Jetson Setup for VPI
+#### Jetson Setup for VPI <!-- omit from toc -->
 
 Source: [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/jetson_vpi.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/jetson_vpi.html)
 
@@ -124,7 +117,7 @@ sudo apt-get update
 sudo apt-get install -y pva-allow-2
 ```
 
-#### Setup Isaac ROS
+#### Setup Isaac ROS <!-- omit from toc -->
 
 Source: [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html)
 
@@ -141,7 +134,7 @@ echo "export ISAAC_ROS_WS=${HOME}/workspaces/isaac_ros-dev/" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-#### Jetson Clocks (Optional)
+#### Jetson Clocks (Optional) <!-- omit from toc -->
 
 Running `sudo jetson_clocks` maximises Jetson performance. We can make `jetson_clocks` run on start up.
 
@@ -170,7 +163,7 @@ sudo systemctl enable jetsonClocks.service
 
 Reboot the computer to let the changes take effect.
 
-#### Add Authorized SSH Keys (Optional)
+#### Add Authorized SSH Keys (Optional) <!-- omit from toc -->
 
 To avoid keying in the password each time login in via SSH, add the client computer's public key (e.g. `id_rsa.pub`) into `~/.ssh/authorized_keys`. Note that `~/.ssh/authorized_keys` should be a **file** not a folder.
 
