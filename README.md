@@ -2,6 +2,8 @@
 
 A set of scripts to ease development with [Isaac ROS Docker containers](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_common/index.html).
 
+- [Available Environments](#available-environments)
+- [Sample Hardware and OS Requirements](#sample-hardware-and-os-requirements)
 - [Installation](#installation)
   - [Installation on Jetson](#installation-on-jetson)
     - [Install Jetpack](#install-jetpack)
@@ -11,26 +13,60 @@ A set of scripts to ease development with [Isaac ROS Docker containers](https://
     - [Setup Isaac ROS](#setup-isaac-ros)
     - [Jetson Clocks (Optional)](#jetson-clocks-optional)
     - [Add Authorized SSH Keys (Optional)](#add-authorized-ssh-keys-optional)
-  - [Installation on local computer](#installation-on-local-computer)
+  - [Installation on x86\_64](#installation-on-x86_64)
 - [Build Isaac ROS Docker Image](#build-isaac-ros-docker-image)
 - [Production](#production)
 - [ROS Dependencies](#ros-dependencies)
 - [Notes](#notes)
   - [TODO](#todo)
   - [Issues](#issues)
-    - [Husarnet](#husarnet)
-    - [Jetson Clocks](#jetson-clocks)
-    - [ZED](#zed)
-    - [Permission Issues with FLIR](#permission-issues-with-flir)
-    - [Permission Issues (General)](#permission-issues-general)
-    - [Docker Max Depth Exceeded](#docker-max-depth-exceeded)
-    - [OCI runtime error](#oci-runtime-error)
+
+## Available Environments
+
+All environments use a common runtime setup (`dockerfiles/environments/Dockerfile.install_env`):
+
+- Base tooling: `tmux`, `tmuxp`, `colcon-clean`, `foxglove-bridge`, `speedtest-cli`
+- Per-environment shell setup: `.bashrc`, `.bash_aliases`, `on_entry.sh`
+- Per-environment ROS dependencies: `rosdep-apt.list`, `rosdep-pip.list`
+- Shared mounts: `isaac_ros-dev` workspace and cache directories (`ccache`, `torch`, `matplotlib`)
+
+All environments come with a GPU-accelerated vision stack utilizing TensorRT optimized for edge inference on Jetsons.
+
+Environment-specific differences come from the `CONFIG_IMAGE_KEY` chain in each `.isaac_ros_common-config`.
+
+We deploy on three types of vehicles:
+
+- Autonomous Surface Vehicle (ASVs)
+- Autonomous Underwater Vehicles (AUVs)
+- Unmanned Aerial Vehicles (UAVs)
+
+| Environment | Primary use                                                                             | Unique features                                                        |
+| ----------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `asv`       | ASV software stack on Jetson                                                            | Spinnaker support for cameras, `eigen-quadprog`, `pcl`, `rtcm`, `nmea` |
+| `auv`       | AUV software stack on Jetson                                                            |                                                                        |
+| `auv_sim`   | AUV simulation with [DAVE Sim](https://field-robotics-lab.github.io/dave.doc/) + Gazebo |                                                                        |
+| `uav2`      | UAV software stack on Jetson                                                            | PX4 DDS bridge support via Micro XRCE-DDS Agent, Argus camera support  |
+| `uav2_sim`  | UAV simulation with PX4 + Gazebo                                                        | PX4 Autopilot SITL + Gazebo, MAVSDK tooling                            |
+
+Tip: start from the nearest environment and tune `rosdep-apt.list`, `rosdep-pip.list`, and `CONFIG_IMAGE_KEY` for your project.
+
+## Sample Hardware and OS Requirements
+
+We tested this repository on these configurations:
+
+| Scenario                       | Sample hardware                                          | Sample OS / platform             | Environments                    |
+| ------------------------------ | -------------------------------------------------------- | -------------------------------- | ------------------------------- |
+| Jetson development (`aarch64`) | Jetson Orin NX or AGX Orin, 40 GB+ free disk             | JetPack 6.x (Ubuntu 22.04 based) | `asv`, `auv`, `miniauv`, `uav2` |
+| Workstation (`x86_64`)         | 8+ CPU cores, 16-32 GB RAM, NVIDIA GPU, 50 GB+ free disk | Ubuntu 22.04 LTS                 | `auv_sim`, `uav2_sim`           |
 
 ## Installation
 
 _For ease of installation, save this directory as `~/workspaces/ros2-docker`._
 
 ### Installation on Jetson
+
+<details>
+<summary><strong>Installation on Jetson</strong></summary>
 
 Source: [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html)
 
@@ -137,7 +173,12 @@ Reboot the computer to let the changes take effect.
 
 To avoid keying in the password each time login in via SSH, add the client computer's public key (e.g. `id_rsa.pub`) into `~/.ssh/authorized_keys`. Note that `~/.ssh/authorized_keys` should be a **file** not a folder.
 
-### Installation on local computer
+</details>
+
+### Installation on x86_64
+
+<details>
+<summary><strong>Installation on x86_64</strong></summary>
 
 Follow [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html)
 and [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html) to set up
@@ -150,6 +191,8 @@ newgrp docker
 ```
 
 outside of the script.
+
+</details>
 
 ## Build Isaac ROS Docker Image
 
@@ -216,66 +259,4 @@ Save this as a file in your environment directory and install it in the correspo
 
 ### Issues
 
-#### Husarnet
-
-- For now, install and join the network outside Docker. Unable to join while building the Docker containers.
-- For now, run `husarnet-dds singleshot` inside the running container. No effect when starting in Dockerfiles.
-
-#### Jetson Clocks
-
-**UPDATE: After manually compiling the L4T 36.3 kernel and reflashing to enable USB modem connection (another unrelated issue), this issue seems to have been fixed.**
-
-- Even after setting Jetson Clocks to run on startup [above](#jetson-clocks-optional), it may randomly fail to start up due to a bug with `nvpmodel` (https://forums.developer.nvidia.com/t/segfault-in-usr-sbin-nvpmodel/295010/16). Simply do:
-
-```bash
-sudo systemctl restart nvpmodel.service
-sudo systemctl restart jetsonClocks.service
-```
-
-Where the second line can be replaced with `sudo jetson_clocks` if the service is not set up.
-
-#### ZED
-
-When starting camera stream for the ZED camera within the Docker container using the following command:
-
-```bash
-ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zedm
-```
-
-We might see the following errors:
-
-- No camera detected.
-- `MOTION SENSORS REQUIRED` error.
-
-To fix these errors, do the following:
-
-1. (If they are not already done,) install the ZED SDK ("yes" for all options) and build the `zed_wrapper` ROS package outside the Docker container.
-2. Run the above command (using `zed_wrapper` to start the camera stream) outside the container and interrupt the process.
-
-Thereafter, the camera stream can be started within the container without errors.
-
-This fix seems to not persist between boots. If needed, repeat the process to fix the issue after boot.
-
-#### Permission Issues with FLIR
-
-Unable to obtain any FLIR camera feed or use FLIR spinnaker interface. Need to make sure the udev rules are correct (can be checked by `lsusb` to check the vendor id etc.). We noticed there were permission issues even after the udev rule fix, a temporary fix was to run `chmod 777 /dev/bus -R` to connect to camera.
-
-#### Permission Issues (General)
-
-Directories / files created by Dockerfiles and helper scripts run in root as well as directories mounted that are not present previously will have `root` as the owner (e.g., `~/.cache/ccache` if it was not present before mounting). Simply do `sudo chmod <user> -R <directory>`.
-
-(If changing ownership fixes [Permission Issues with FLIR](#permission-issues-with-flir), remove it.)
-
-#### Docker Max Depth Exceeded
-
-As of 31 May 2025, having too many image layers will result in a `docker: Error response from daemon: max depth exceeded` error. The maximum number of image layers seems to be 208 (run `docker history <image_name> | wc -l` to check).
-
-#### OCI runtime error
-
-If you see the following error even after running [Jetson Setup for VPI](#jetson-setup-for-vpi):
-
-```bash
-docker: Error response from daemon: failed to create task for container: failed to create shim task: OCI runtime create failed: could not apply required modification to OCI specification: error modifying OCI spec: failed to inject CDI devices: failed to inject devices: failed to stat CDI host device "/dev/fb0": no such file or directory: unknown
-```
-
-Just re-run the commands in [Jetson Setup for VPI](#jetson-setup-for-vpi) and try again.
+See [ISSUES.md](ISSUES.md).
