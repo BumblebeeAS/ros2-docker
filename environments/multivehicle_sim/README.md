@@ -18,7 +18,7 @@ Notable layers:
 | `micro_xrce_dds_agent` | Builds and installs Micro XRCE-DDS Agent v2.4.3 |
 | `dave_sim` | Dave underwater simulation plugins |
 | `auv_sim` | AUV simulation dependencies |
-| `multivehicle_sim` | Environment-specific setup (`on_entry.sh`, `.bash_aliases`, `.bashrc`) |
+| `multivehicle_sim` | Environment-specific setup (`on_entry.sh`, `.bash_aliases`, `.bashrc`) + `bb_robotx_dashboard` pip deps (`fastapi`, `uvicorn[standard]`, `pydantic-settings`) installed in `Dockerfile.multivehicle_sim` |
 
 ## on_entry.sh
 
@@ -30,13 +30,29 @@ Runs at container startup as the `admin` user. Sets up the PX4 Gazebo model and 
 
 **Must be re-run after rebuilding `uav2_description`** (since the URDF → SDF conversion is done at runtime, not at image build time).
 
+If `/workspaces/common_ws/src/bb_robotx_dashboard` is checked out, the script
+also bootstraps the dashboard's protobuf bindings (idempotent, each step
+wrapped in `|| true`):
+
+4. `git clone MonkeScripts/robocommand → third_party/robocommand` (upstream `.proto` sources)
+5. `scripts/fetch_protoc.sh` (downloads protoc 33 into `third_party/protoc/`; needs `unzip`)
+6. `scripts/compile_protos.sh` (writes `bb_robotx_dashboard/proto/*_pb2.py`)
+
 ## Environment (`.bashrc`)
+
+`Dockerfile.install_env` appends this file into `/home/admin/.bashrc` and `/root/.bashrc` at image build time, so every interactive shell — including tmux panes spawned by tmuxp — picks up these exports.
 
 | Variable | Value | Purpose |
 |---|---|---|
-| `GZ_SIM_RESOURCE_PATH` | `…:~/PX4-Autopilot/Tools/simulation/gz/models | Allows Gazebo to resolve `model://uav2_description/meshes/…` URIs from the UAV model SDF |
+| `GZ_SIM_RESOURCE_PATH` | `…:~/PX4-Autopilot/Tools/simulation/gz/models` | Allows Gazebo to resolve `model://uav2_description/meshes/…` URIs from the UAV model SDF. `uav2_description` is in `uav_ws`, which is not sourced globally. |
+| `ROBOCOMMAND_HOST` | `localhost` | Host of the RoboCommand TCP server that `bb_robotx_dashboard` connects to. Override per-pane to target a real vehicle. |
+| `ROBOCOMMAND_PORT` | `9000` | RoboCommand TCP port. |
+| `ROBOCOMMAND_TEAM_ID` | `42` | Team identifier sent on the RoboCommand handshake. |
+| `DASHBOARD_LISTEN_HOST` | `0.0.0.0` | Bind address for the FastAPI web backend. |
+| `DASHBOARD_LISTEN_PORT` | `8080` | Browser hits this. |
+| `DASHBOARD_ADMIN_SECRET` | `bumblebee` | Bearer secret for `/api/led` and `/api/incident`. Rotate before exposing beyond localhost; changes require an image rebuild. |
 
-`uav2_description` is in `uav_ws`, which is not sourced globally. Without this entry, Gazebo (started by `sim_entrypoint`, not PX4) cannot find UAV mesh files when running the multivehicle sim.
+The `DASHBOARD_*` / `ROBOCOMMAND_*` block lives here (rather than in `on_entry.sh`) because `on_entry.sh` is sourced once into the initial shell, and anything started by a pre-existing tmux server would miss the exports. Baking them into `~/.bashrc` means every shell gets them unconditionally, regardless of tmux state.
 
 ## Aliases (`.bash_aliases`)
 

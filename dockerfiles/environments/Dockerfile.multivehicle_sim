@@ -3,5 +3,15 @@ FROM $BASE_IMAGE
 
 ENV LOCAL_ENV_FOLDER=environments/multivehicle_sim
 
+# bb_robotx_dashboard FastAPI backend deps. websockets is pulled in by
+# uvicorn[standard]. protobuf is intentionally NOT installed here — the
+# system already has a compatible google.protobuf runtime; see the
+# bb_robotx_dashboard README on when/how to bump it in-place if needed.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install \
+        'fastapi' \
+        'uvicorn[standard]' \
+        'pydantic-settings'
+
 # Change the date below to refresh the docker build cache when needed
-RUN echo "Updated 2026-02-27"
+RUN echo "Updated 2026-04-20"

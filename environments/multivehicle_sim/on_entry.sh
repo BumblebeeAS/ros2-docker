@@ -23,3 +23,22 @@ mkdir -p ${PX4_MODEL_DIR}
 gz sdf -p ${UAV2_DESC_URDF_DIR}/uav2.urdf > ${PX4_MODEL_DIR}/model.sdf
 ln -sf $(realpath ${ETC_DIR}/model.config) ${PX4_MODEL_DIR}
 ln -sf $(realpath ${ETC_DIR}/5000_gz_uav2) ${PX4_AIRFRAMES_DIR}
+
+# bb_robotx_dashboard proto bootstrap (README §Setup). Each step idempotent;
+# `|| true` so a missing network / unzip doesn't halt the entrypoint. The
+# dashboard's runtime env vars (ROBOCOMMAND_*, DASHBOARD_*) live in
+# environments/multivehicle_sim/.bashrc so every tmux pane sees them.
+DASHBOARD_PKG_DIR=/workspaces/common_ws/src/bb_robotx_dashboard
+if [ -d "${DASHBOARD_PKG_DIR}" ]; then
+    if [ ! -d "${DASHBOARD_PKG_DIR}/third_party/robocommand/proto" ]; then
+        git clone https://github.com/MonkeScripts/robocommand \
+            "${DASHBOARD_PKG_DIR}/third_party/robocommand" || true
+    fi
+    if [ ! -x "${DASHBOARD_PKG_DIR}/third_party/protoc/bin/protoc" ]; then
+        (cd "${DASHBOARD_PKG_DIR}" && bash scripts/fetch_protoc.sh) || true
+    fi
+    if [ -d "${DASHBOARD_PKG_DIR}/third_party/robocommand/proto" ] \
+            && [ ! -f "${DASHBOARD_PKG_DIR}/bb_robotx_dashboard/proto/report_pb2.py" ]; then
+        (cd "${DASHBOARD_PKG_DIR}" && bash scripts/compile_protos.sh) || true
+    fi
+fi
