@@ -54,7 +54,7 @@ We tested this repository on these configurations:
 
 ## Installation
 
-_For ease of installation, save this directory as `~/workspaces/ros2-docker`._
+_For ease of installation, save this directory as `~/workspaces/isaac-ros-docker`._
 
 ### Installation on Jetson
 

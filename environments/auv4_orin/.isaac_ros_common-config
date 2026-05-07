@@ -20,4 +20,4 @@ MOUNT_DIRS=(
     "$HOME/.cache/matplotlib:/home/admin/.cache/matplotlib"
 )
 WORKDIR=/workspaces/isaac_ros-dev
-DOCKER_CONTEXT_DIR=$HOME/workspaces/ros2-docker/
+DOCKER_CONTEXT_DIR=$HOME/workspaces/isaac-ros-docker/
