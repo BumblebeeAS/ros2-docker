@@ -1,0 +1,6 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+# Source: https://docs.docker.com/reference/dockerfile/#example-cache-apt-packages
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; \
+  echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
