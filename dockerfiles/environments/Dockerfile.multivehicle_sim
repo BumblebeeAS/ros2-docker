@@ -13,5 +13,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
         'uvicorn[standard]' \
         'pydantic-settings'
 
-# Change the date below to refresh the docker build cache when needed
-RUN echo "Updated 2026-04-20"
+RUN apt-get purge -y npm \                                                                                                            
+      && apt-get autoremove -y \                                                                                                               
+      && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \                                                                           
+      && apt-get install -y nodejs \                                                                                                           
+      && rm -rf /var/lib/apt/lists/*  
