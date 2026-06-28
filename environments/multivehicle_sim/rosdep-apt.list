@@ -27,3 +27,4 @@ ros-humble-isaac-ros-common
 ros-humble-isaac-ros-nitros-image-type
 ros-humble-isaac-ros-nitros-camera-info-type
 ros-humble-marine-acoustic-msgs
+ros-humble-pcl-ros
