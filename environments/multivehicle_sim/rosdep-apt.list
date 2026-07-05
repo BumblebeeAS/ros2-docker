@@ -29,3 +29,5 @@ ros-humble-isaac-ros-nitros-camera-info-type
 ros-humble-marine-acoustic-msgs
 ros-humble-pcl-ros
 ros-humble-spatio-temporal-voxel-layer
+ros-humble-diagnostic-updater
+ros-humble-nav2-msgs
