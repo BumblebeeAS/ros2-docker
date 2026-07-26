@@ -31,3 +31,4 @@ ros-humble-pcl-ros
 ros-humble-spatio-temporal-voxel-layer
 ros-humble-diagnostic-updater
 ros-humble-nav2-msgs
+ros-humble-point-cloud-transport
