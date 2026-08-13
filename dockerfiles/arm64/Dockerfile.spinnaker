@@ -1,6 +1,10 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
-ARG ROS_DISTRO=humble
+ARG ROS_DISTRO=jazzy
+
+# NOTE: Teledyne distributes this arm64 SDK build for Ubuntu 22.04. Its Debian
+# dependencies are currently installable on Noble, but Ubuntu 24.04 is not a
+# vendor-published target for this artifact.
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
