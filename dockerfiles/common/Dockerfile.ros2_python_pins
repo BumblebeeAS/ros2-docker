@@ -1,0 +1,19 @@
+# Pins Python versions ROS 2 forces on us.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# This layer runs after every other pip install and deliberately overrides what
+# upstream packages ask for (e.g. lerobot requires numpy>=2.0 but ROS requires
+# numpy<2 -- impossible to resolve automatically, so we install then override).
+# Expect `pip check` to report those conflicts; they are intentional.
+#
+# numpy<2        required by cv_bridge (ROS 2 Jazzy)
+# scipy<1.18     1.18 is the first release requiring numpy>=2.0
+# setuptools<80  setuptools>=80 breaks `colcon build --symlink-install`
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python3 -m pip install \
+    "numpy<2" \
+    "scipy<1.18" \
+    "setuptools<80"
