@@ -10,8 +10,8 @@ if [ -d /etc/profile.d ]; then
   unset i
 fi
 
-# ROS2 Humble
-source /opt/ros/humble/setup.bash
+# ROS 2 Jazzy
+source /opt/ros/jazzy/setup.bash
 
 # Prevents ROS nodes on other devices in the subnet not in the same ROS domain from talking to each other
 export ROS_DOMAIN_ID=2

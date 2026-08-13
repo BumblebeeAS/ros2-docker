@@ -1,13 +1,15 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
+ARG ROS_DISTRO=jazzy
+
 # Apt packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y \
     iproute2 \
     ncdu \
-    ros-humble-foxglove-bridge \
+    ros-${ROS_DISTRO}-foxglove-bridge \
     speedtest-cli \
     tmux
 
