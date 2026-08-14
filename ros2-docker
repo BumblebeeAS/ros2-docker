@@ -1,317 +1,260 @@
-#!/bin/bash
-#
-# Copyright (c) 2021-2024, NVIDIA CORPORATION.  All rights reserved.
-#
-# NVIDIA CORPORATION and its licensors retain all intellectual property
-# and proprietary rights in and to this software, related documentation
-# and any modifications thereto.  Any use, reproduction, disclosure or
-# distribution of this software and related documentation without an express
-# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source $ROOT/utils/print_color.sh
+ERROR='\033[0;31m'
+SUCCESS='\033[0;32m'
+WARNING='\033[0;33m'
+INFO='\033[0;36m'
+NC='\033[0m'
 
-function usage() {
-    print_info "Usage: run_dev.sh {-d isaac_ros_dev directory path OPTIONAL}"
-    print_info "Copyright (c) 2021-2024, NVIDIA CORPORATION."
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ros-docker"
+PROJECT_ROOT_FILE="$CONFIG_DIR/project_root"
+ENVIRONMENT_FILE="$CONFIG_DIR/environment"
+
+find_project_root() {
+    local candidate dir
+    for candidate in "${ROS_DOCKER_PROJECT_ROOT:-}" "$(cat "$PROJECT_ROOT_FILE" 2>/dev/null || true)"; do
+        if [[ -n "$candidate" && -f "$candidate/build_image_layers.sh" ]]; then
+            printf "%s" "$candidate"
+            return
+        fi
+    done
+
+    for dir in "$SCRIPT_DIR" "$PWD"; do
+        while [[ "$dir" != "/" ]]; do
+            if [[ -f "$dir/build_image_layers.sh" ]]; then
+                printf "%s" "$dir"
+                return
+            fi
+            dir=$(dirname "$dir")
+        done
+    done
+
+    printf '%b%s%b\n' "$ERROR" "Could not find the isaac-ros-docker project root." "$NC" >&2
+    printf '%b%s%b\n' "$INFO" "Set ROS_DOCKER_PROJECT_ROOT or rerun ./setup.sh." "$NC" >&2
+    exit 1
 }
 
-DOCKER_ARGS=()
+PROJECT_ROOT=$(find_project_root)
+ENVIRONMENT_OVERRIDE=""
 
-# Read and parse config file if exists
-#
-# CONFIG_IMAGE_KEY (string, can be empty)
+usage() {
+    printf "Usage: ros2-docker [--environment <name>] <command> [options]\n"
+    printf "\nCommands:\n"
+    printf "    use <environment>       Select the default environment.\n"
+    printf "    environments            List available environments.\n"
+    printf "    build [-r]              Build the selected environment image.\n"
+    printf "        -r, --rebuild       Rebuild without Docker's layer cache.\n"
+    printf "    up                      Start the container in the background.\n"
+    printf "    start                   Start the container, then open a shell.\n"
+    printf "    exec <cmd>              Run a command in the running container.\n"
+    printf "    down                    Stop and remove the container.\n"
+    printf "    list                    List running containers and images.\n"
+    printf "    config                  Print the active environment config.\n"
+    printf "    -h | --help             Show this help message.\n"
+}
 
-if [[ -f "${ROOT}/.isaac_ros_common-config" ]]; then
-    . "${ROOT}/.isaac_ros_common-config"
-fi
-
-# Override with config from user home directory if exists
-if [[ -f ~/.isaac_ros_common-config ]]; then
-    . ~/.isaac_ros_common-config
-fi
-
-# Parse command-line args
-IMAGE_KEY=ros2_humble
-
-# Pick up config image key if specified
-if [[ ! -z "${CONFIG_IMAGE_KEY}" ]]; then
-    IMAGE_KEY=$CONFIG_IMAGE_KEY
-fi
-
-ISAAC_ROS_DEV_DIR="${ISAAC_ROS_WS}"
-SKIP_IMAGE_BUILD=0
-VERBOSE=0
-VALID_ARGS=$(getopt -o hvd:i:ba: --long help,verbose,isaac_ros_dev_dir:,image_key:,skip_image_build,docker_arg: -- "$@")
-eval set -- "$VALID_ARGS"
-while [ : ]; do
-  case "$1" in
-    -d | --isaac_ros_dev_dir)
-        ISAAC_ROS_DEV_DIR="$2"
-        shift 2
-        ;;
-    -i | --image_key)
-        IMAGE_KEY="$2"
-        shift 2
-        ;;
-    -b | --skip_image_build)
-        SKIP_IMAGE_BUILD=1
-        shift
-        ;;
-    -a | --docker_arg)
-        DOCKER_ARGS+=("$2")
-        shift 2
-        ;;
-    -v | --verbose)
-        VERBOSE=1
-        shift
-        ;;
-    -h | --help)
-        usage
-        exit 0
-        ;;
-    --) shift;
-        break
-        ;;
-  esac
-done
-
-# Setup on-exit traps
-ON_EXIT=()
-function cleanup {
-    for command in "${ON_EXIT[@]}"
-    do
-        $command
+list_environments() {
+    local config
+    for config in "$PROJECT_ROOT"/environments/*/.ros_docker-config; do
+        [[ -f "$config" ]] && basename "$(dirname "$config")"
     done
 }
-trap cleanup EXIT
 
-pushd . >/dev/null
-cd $ROOT
-ON_EXIT+=("popd")
-
-# Fall back if isaac_ros_dev_dir not specified
-if [[ -z "$ISAAC_ROS_DEV_DIR" ]]; then
-    ISAAC_ROS_DEV_DIR_DEFAULTS=("$HOME/workspaces/isaac" "/workspaces/isaac" "/mnt/nova_ssd/workspaces/isaac")
-    for ISAAC_ROS_DEV_DIR in "${ISAAC_ROS_DEV_DIR_DEFAULTS[@]}"
-    do
-        if [[ -d "$ISAAC_ROS_DEV_DIR" ]]; then
-            break
-        fi
-    done
-
-    if [[ ! -d "$ISAAC_ROS_DEV_DIR" ]]; then
-        ISAAC_ROS_DEV_DIR=$(realpath "$ROOT/../")
+select_environment() {
+    local environment="$1"
+    if [[ ! -f "$PROJECT_ROOT/environments/$environment/.ros_docker-config" ]]; then
+        printf "${ERROR}Unknown environment: %s${NC}\n" "$environment" >&2
+        printf '%b%s%b\n' "$INFO" "Available environments:" "$NC" >&2
+        list_environments >&2
+        exit 1
     fi
-    print_warning "isaac not specified, assuming $ISAAC_ROS_DEV_DIR"
-fi
+    mkdir -p "$CONFIG_DIR"
+    printf "%s" "$environment" > "$ENVIRONMENT_FILE"
+    printf "${SUCCESS}Default environment set to: %s${NC}\n" "$environment"
+}
 
-# Validate isaac_ros_dev_dir
-if [[ ! -d "$ISAAC_ROS_DEV_DIR" ]]; then
-    print_error "Specified isaac does not exist: $ISAAC_ROS_DEV_DIR"
-    exit 1
-fi
-
-# Prevent running as root.
-if [[ $(id -u) -eq 0 ]]; then
-    print_error "This script cannot be executed with root privileges."
-    print_error "Please re-run without sudo and follow instructions to configure docker for non-root user if needed."
-    exit 1
-fi
-
-# Check if user can run docker without root.
-RE="\<docker\>"
-if [[ ! $(groups $USER) =~ $RE ]]; then
-    print_error "User |$USER| is not a member of the 'docker' group and cannot run docker commands without sudo."
-    print_error "Run 'sudo usermod -aG docker \$USER && newgrp docker' to add user to 'docker' group, then re-run this script."
-    print_error "See: https://docs.docker.com/engine/install/linux-postinstall/"
-    exit 1
-fi
-
-# Check if able to run docker commands.
-if [[ -z "$(docker ps)" ]] ;  then
-    print_error "Unable to run docker commands. If you have recently added |$USER| to 'docker' group, you may need to log out and log back in for it to take effect."
-    print_error "Otherwise, please check your Docker installation."
-    exit 1
-fi
-
-# Check if git-lfs is installed.
-git lfs &>/dev/null
-if [[ $? -ne 0 ]] ; then
-    print_error "git-lfs is not insalled. Please make sure git-lfs is installed before you clone the repo."
-    exit 1
-fi
-
-# Check if all LFS files are in place in the repository where this script is running from.
-cd $ROOT
-git rev-parse &>/dev/null
-if [[ $? -eq 0 ]]; then
-    LFS_FILES_STATUS=$(cd $ISAAC_ROS_DEV_DIR && git lfs ls-files | cut -d ' ' -f2)
-    for (( i=0; i<${#LFS_FILES_STATUS}; i++ )); do
-        f="${LFS_FILES_STATUS:$i:1}"
-        if [[ "$f" == "-" ]]; then
-            print_error "LFS files are missing. Please re-clone repos after installing git-lfs."
-            git lfs ls-files
-            exit 1
-        fi
-    done
-fi
-
-# Determine base image key
-PLATFORM="$(uname -m)"
-BASE_IMAGE_KEY=$PLATFORM
-if [[ ! -z "${IMAGE_KEY}" ]]; then
-    BASE_IMAGE_KEY=$BASE_IMAGE_KEY.$IMAGE_KEY
-fi
-
-# Check skip image build from env
-if [[ ! -z $SKIP_DOCKER_BUILD ]]; then
-    SKIP_IMAGE_BUILD=1
-fi
-
-# Check skip image build from config
-if [[ ! -z $CONFIG_SKIP_IMAGE_BUILD ]]; then
-    SKIP_IMAGE_BUILD=1
-fi
-
-BASE_NAME="isaac_ros_dev-$PLATFORM"
-if [[ ! -z "$CONFIG_CONTAINER_NAME_SUFFIX" ]] ; then
-    BASE_NAME="$BASE_NAME-$CONFIG_CONTAINER_NAME_SUFFIX"
-fi
-CONTAINER_NAME="$BASE_NAME-container"
-
-# Remove any exited containers.
-# if [ "$(docker ps -a --quiet --filter status=exited --filter name=$CONTAINER_NAME)" ]; then
-#     docker rm $CONTAINER_NAME > /dev/null
-# fi
-
-# Add workdir if declared
-if [[ -n $WORKDIR ]]; then
-    DOCKER_ARGS+=("--workdir $WORKDIR")
-fi
-
-# Re-use existing container.
-if [ "$(docker ps -a --quiet --filter status=running --filter name=$CONTAINER_NAME)" ]; then
-    # If we're not in an interactive terminal (e.g., systemd), don't try to attach.
-    if [ ! -t 0 ]; then
-        print_info "Container already running: $CONTAINER_NAME (non-interactive, skipping attach)"
-        exit 0
+load_environment() {
+    ENVIRONMENT="${ENVIRONMENT_OVERRIDE:-${ROS_DOCKER_ENVIRONMENT:-$(cat "$ENVIRONMENT_FILE" 2>/dev/null || true)}}"
+    if [[ -z "$ENVIRONMENT" ]]; then
+        printf '%b%s%b\n' "$ERROR" "No environment selected." "$NC" >&2
+        printf '%b%s%b\n' "$INFO" "Run: ros2-docker use <environment>" "$NC" >&2
+        exit 1
     fi
 
-    print_info "Attaching to running container: $CONTAINER_NAME"
-    docker exec -i -t -u admin ${DOCKER_ARGS[@]} $CONTAINER_NAME /bin/bash $@
-    exit 0
-fi
+    ENV_FILE="$PROJECT_ROOT/environments/$ENVIRONMENT/.ros_docker-config"
+    if [[ ! -f "$ENV_FILE" ]]; then
+        printf "${ERROR}Environment config not found: %s${NC}\n" "$ENV_FILE" >&2
+        exit 1
+    fi
+    # shellcheck disable=SC1090
+    source "$ENV_FILE"
 
-# Summarize launch
-print_info "Launching Isaac ROS Dev container with image key ${BASE_IMAGE_KEY}: ${WORKDIR}"
+    # Keep the runtime implementation explicit while retaining the established
+    # isaac_ros_common configuration names in each environment file.
+    ENVIRONMENT_NAME="${ENVIRONMENT_NAME:-$ENVIRONMENT}"
+    CONTAINER_NAME="${CONTAINER_NAME:-isaac-ros-${ENVIRONMENT_NAME//_/-}}"
+    DOCKER_IMAGE_NAME="$BUILT_IMAGE"
+}
 
-# Build image to launch
-if [[ $BUILD_IMAGE_FLAG -eq 1 ]]; then
-    print_info "Building image keys $BASE_IMAGE_KEY base as image: $BASE_NAME"
-   $ROOT/build_image_layers.sh --image_key "$BASE_IMAGE_KEY" --image_name "$BASE_NAME" --context_dir $DOCKER_CONTEXT_DIR
+container_exists() {
+    docker container inspect "$CONTAINER_NAME" >/dev/null 2>&1
+}
 
-    # Check result
-    if [ $? -ne 0 ]; then
-        if [[ -z $(docker image ls --quiet $BASE_NAME) ]]; then
-            print_error "Building image failed and no cached image found for $BASE_NAME, aborting."
-            exit 1
-        else
-            print_warning "Unable to build image, but cached image found."
+container_running() {
+    [[ "$(docker container inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null || true)" == "true" ]]
+}
+
+ensure_image_exists() {
+    if ! docker image inspect "$DOCKER_IMAGE_NAME" >/dev/null 2>&1; then
+        if [[ ${BUILD_IMAGE_FLAG:-1} -eq 1 ]]; then
+            printf "${INFO}Image '%s' not found; building it first.${NC}\n" "$DOCKER_IMAGE_NAME"
+            build_image
         fi
     fi
-fi
-
-# Check image is available
-if [[ -z $(docker image ls --quiet $BASE_NAME) ]]; then
-    print_error "No built image found for $BASE_NAME, aborting."
-    exit 1
-fi
-
-# Map host's display socket to docker
-DOCKER_ARGS+=("-v /tmp/.X11-unix:/tmp/.X11-unix")
-DOCKER_ARGS+=("-v $HOME/.Xauthority:/home/admin/.Xauthority:rw")
-DOCKER_ARGS+=("-e DISPLAY")
-DOCKER_ARGS+=("-e NVIDIA_VISIBLE_DEVICES=all")
-DOCKER_ARGS+=("-e NVIDIA_DRIVER_CAPABILITIES=all")
-DOCKER_ARGS+=("-e ROS_DOMAIN_ID")
-DOCKER_ARGS+=("-e USER")
-DOCKER_ARGS+=("-e ISAAC_ROS_WS=/workspaces/isaac_ros-dev")
-DOCKER_ARGS+=("-e HOST_USER_UID=`id -u`")
-DOCKER_ARGS+=("-e HOST_USER_GID=`id -g`")
-
-# Forward SSH Agent to container if the ssh agent is active.
-if [[ -n $SSH_AUTH_SOCK ]]; then
-    DOCKER_ARGS+=("-v $SSH_AUTH_SOCK:/ssh-agent")
-    DOCKER_ARGS+=("-e SSH_AUTH_SOCK=/ssh-agent")
-fi
-
-if [[ $PLATFORM == "aarch64" ]]; then
-    DOCKER_ARGS+=("-e NVIDIA_VISIBLE_DEVICES=nvidia.com/gpu=all,nvidia.com/pva=all")
-    DOCKER_ARGS+=("-v /usr/bin/tegrastats:/usr/bin/tegrastats")
-    DOCKER_ARGS+=("-v /tmp/:/tmp/")
-    DOCKER_ARGS+=("-v /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra")
-    DOCKER_ARGS+=("-v /usr/src/jetson_multimedia_api:/usr/src/jetson_multimedia_api")
-    DOCKER_ARGS+=("--pid=host")
-    DOCKER_ARGS+=("-v /usr/share/vpi3:/usr/share/vpi3")
-    DOCKER_ARGS+=("-v /dev/input:/dev/input")
-
-    # If jtop present, give the container access
-    if [[ $(getent group jtop) ]]; then
-        DOCKER_ARGS+=("-v /run/jtop.sock:/run/jtop.sock:ro")
+    if ! docker image inspect "$DOCKER_IMAGE_NAME" >/dev/null 2>&1; then
+        printf "${WARNING}Image '%s' not found. Build it with: ros2-docker --environment %s build${NC}\n" \
+            "$DOCKER_IMAGE_NAME" "$ENVIRONMENT"
+        return 1
     fi
-fi
+}
 
-# Optionally load custom docker arguments from file
-if [[ -z "${DOCKER_ARGS_FILE}" ]]; then
-    DOCKER_ARGS_FILE=".isaac_ros_dev-dockerargs"
-fi
+build_image() {
+    if container_running; then
+        printf "${WARNING}%s is running. Stop it first with: ros2-docker down${NC}\n" "$CONTAINER_NAME"
+        exit 1
+    fi
+    case "${1:-}" in
+        "") "$PROJECT_ROOT/build_image_layers.sh" --config "$ENV_FILE" ;;
+        -r | --rebuild) "$PROJECT_ROOT/build_image_layers.sh" --config "$ENV_FILE" --rebuild ;;
+        *) printf "${ERROR}Invalid build option: %s${NC}\n" "$1" >&2; exit 1 ;;
+    esac
+}
 
-# Check for dockerargs file in home directory, then locally in root
-if [[ -f ~/${DOCKER_ARGS_FILE} ]]; then
-    DOCKER_ARGS_FILEPATH=`realpath ~/${DOCKER_ARGS_FILE}`
-elif [[ -f "${ROOT}/${DOCKER_ARGS_FILE}" ]]; then
-    DOCKER_ARGS_FILEPATH="${ROOT}/${DOCKER_ARGS_FILE}"
-fi
+exec_in_container() {
+    if ! container_running; then
+        printf "${WARNING}No running container named '%s'. Use: ros2-docker start${NC}\n" "$CONTAINER_NAME"
+        return 1
+    fi
 
-if [[ -f "${DOCKER_ARGS_FILEPATH}" ]]; then
-    print_info "Using additional Docker run arguments from $DOCKER_ARGS_FILEPATH"
-    readarray -t DOCKER_ARGS_FILE_LINES < $DOCKER_ARGS_FILEPATH
-    for arg in "${DOCKER_ARGS_FILE_LINES[@]}"; do
-        DOCKER_ARGS+=($(eval "echo $arg | envsubst"))
+    if [[ $# -gt 0 ]]; then
+        printf "${INFO}Executing in %s: %s${NC}\n" "$CONTAINER_NAME" "$*"
+        docker exec -it --workdir "$WORKDIR" "$CONTAINER_NAME" bash -lc "$*"
+    else
+        printf "${INFO}Attaching to: %s${NC}\n" "$CONTAINER_NAME"
+        docker exec -it --workdir "$WORKDIR" "$CONTAINER_NAME" bash
+    fi
+}
+
+up() {
+    if container_running; then
+        printf "${INFO}%s is already running.${NC}\n" "$CONTAINER_NAME"
+        return
+    fi
+    if container_exists; then
+        printf "${WARNING}Removing stopped container: %s${NC}\n" "$CONTAINER_NAME"
+        docker rm "$CONTAINER_NAME" >/dev/null
+    fi
+    ensure_image_exists || return 1
+
+    local container_user="${ROS_DOCKER_CONTAINER_USER:-admin}"
+    if command -v xhost >/dev/null 2>&1; then
+        xhost "+SI:localuser:${container_user}" >/dev/null 2>&1 || true
+    fi
+
+    local -a docker_args=(
+        --name "$CONTAINER_NAME"
+        --network host
+        --ipc host
+        --privileged
+        --runtime nvidia
+        -e "DISPLAY=${DISPLAY:-}"
+        -e NVIDIA_VISIBLE_DEVICES=all
+        -e NVIDIA_DRIVER_CAPABILITIES=all
+        -e "ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}"
+        -e ISAAC_ROS_WS=/workspaces/isaac_ros-dev
+        -e "HOST_USER_UID=$(id -u)"
+        -e "HOST_USER_GID=$(id -g)"
+        -v /tmp/.X11-unix:/tmp/.X11-unix
+        -v /etc/localtime:/etc/localtime:ro
+        -v /dev:/dev
+        -v /run/udev:/run/udev:ro
+        --group-add video
+        --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh
+    )
+
+    [[ -f "$HOME/.Xauthority" ]] && docker_args+=( -v "$HOME/.Xauthority:/home/${container_user}/.Xauthority:rw" )
+    if [[ -n "${SSH_AUTH_SOCK:-}" && -S "$SSH_AUTH_SOCK" ]]; then
+        docker_args+=( -v "$SSH_AUTH_SOCK:/ssh-agent" -e SSH_AUTH_SOCK=/ssh-agent )
+    fi
+    local mount_source
+    for mount_dir in "${MOUNT_DIRS[@]}"; do
+        mount_source="${mount_dir%%:*}"
+        if [[ "$mount_source" = /* && ! -e "$mount_source" ]]; then
+            mkdir -p "$mount_source"
+        fi
+        docker_args+=( -v "$mount_dir" )
     done
-fi
 
-# Add list of workspace directories to mount
-for MOUNT_DIR in "${MOUNT_DIRS[@]}"; do
-    DOCKER_ARGS+=("-v $MOUNT_DIR")
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+        docker_args+=(
+            -e "NVIDIA_VISIBLE_DEVICES=nvidia.com/gpu=all,nvidia.com/pva=all"
+            --pid host
+        )
+        [[ -e /usr/bin/tegrastats ]] && docker_args+=( -v /usr/bin/tegrastats:/usr/bin/tegrastats )
+        [[ -d /usr/lib/aarch64-linux-gnu/tegra ]] && docker_args+=( -v /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra )
+        [[ -d /usr/src/jetson_multimedia_api ]] && docker_args+=( -v /usr/src/jetson_multimedia_api:/usr/src/jetson_multimedia_api )
+        [[ -d /usr/share/vpi4 ]] && docker_args+=( -v /usr/share/vpi4:/usr/share/vpi4 )
+        [[ -d /dev/input ]] && docker_args+=( -v /dev/input:/dev/input )
+        [[ -S /run/jtop.sock ]] && docker_args+=( -v /run/jtop.sock:/run/jtop.sock:ro )
+    fi
+
+    printf "${INFO}Starting %s from %s${NC}\n" "$CONTAINER_NAME" "$DOCKER_IMAGE_NAME"
+    docker run -d "${docker_args[@]}" "$DOCKER_IMAGE_NAME" tail -f /dev/null
+}
+
+down() {
+    local container_user="${ROS_DOCKER_CONTAINER_USER:-admin}"
+    docker stop "$CONTAINER_NAME" >/dev/null 2>&1 || true
+    docker rm "$CONTAINER_NAME" >/dev/null 2>&1 || true
+    if command -v xhost >/dev/null 2>&1; then
+        xhost "-SI:localuser:${container_user}" >/dev/null 2>&1 || true
+    fi
+    printf "${SUCCESS}Stopped: %s${NC}\n" "$CONTAINER_NAME"
+}
+
+while [[ "${1:-}" == "--environment" || "${1:-}" == "-e" ]]; do
+    [[ -n "${2:-}" ]] || { printf '%b%s%b\n' "$ERROR" "--environment requires a value." "$NC" >&2; exit 1; }
+    ENVIRONMENT_OVERRIDE="$2"
+    shift 2
 done
 
-# Run container from image
-print_info "Running $CONTAINER_NAME"
-if [[ $VERBOSE -eq 1 ]]; then
-    set -x
-fi
+COMMAND="${1:-}"
+[[ -n "$COMMAND" ]] || { usage; exit 0; }
+shift || true
 
-# Create an interactive session but detach. For use in startup scripts.
-# This allows the container to run in the background and be attached to later.
-# "tail -f /dev/null" keeps the container running.
-# To attach to the container, simply run this script again. 
-# (See "Attaching to running container" above.)
-
-# For development, consider running: "docker run -it ... /bin/bash" instead
-# to not have to run the script twice to get a shell.
-docker run -dit --rm \
-    --privileged \
-    --network host \
-    --ipc=host \
-    ${DOCKER_ARGS[@]} \
-    -v /etc/localtime:/etc/localtime:ro \
-    -v /dev/:/dev/ \
-    --name $CONTAINER_NAME \
-    --runtime nvidia \
-    --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh \
-    $BASE_NAME \
-    tail -f /dev/null
+case "$COMMAND" in
+    use) [[ $# -eq 1 ]] || { usage; exit 1; }; select_environment "$1" ;;
+    environments) list_environments ;;
+    -h | --help | help) usage ;;
+    *)
+        load_environment
+        case "$COMMAND" in
+            build) build_image "${1:-}" ;;
+            up) up ;;
+            start) up && exec_in_container ;;
+            exec) exec_in_container "$@" ;;
+            down) down ;;
+            list)
+                printf '%b%s%b\n' "$INFO" "RUNNING CONTAINERS:" "$NC"
+                docker ps
+                printf '\n%b%s%b\n' "$INFO" "BUILT IMAGES:" "$NC"
+                docker image list
+                ;;
+            config) printf "%s\n" "$ENV_FILE"; sed -n '1,240p' "$ENV_FILE" ;;
+            *) usage; exit 1 ;;
+        esac
+        ;;
+esac
