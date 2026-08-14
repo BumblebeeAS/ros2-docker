@@ -1,15 +1,15 @@
 BUILD_IMAGE_FLAG=1
 
 # These parameters are only relevant if BUILD_IMAGE_FLAG=1
-CONFIG_IMAGE_KEY=ros2_humble.ultralytics_cuda.trt.ccache.eigen_quadprog.dave_sim.auv_sim.install_env
+CONFIG_IMAGE_KEY=apt_cache.noble_pip.ultralytics_cuda.trt.ccache.eigen_quadprog.dave_sim.auv_sim.install_env.ros2_python_pins
 CONFIG_DOCKER_SEARCH_DIRS=(
-    "$HOME/workspaces/isaac-ros-docker/dockerfiles/common"
-    "$HOME/workspaces/isaac-ros-docker/dockerfiles/isaac_ros_x64"
-    "$HOME/workspaces/isaac-ros-docker/dockerfiles/environments"
+    "dockerfiles/common"
+    "dockerfiles/amd64"
+    "dockerfiles/environments"
 )
 
 # Runs built image if BUILD_IMAGE_FLAG=0
-BUILT_IMAGE=isaac_ros_dev-aarch64:latest
+BUILT_IMAGE=isaac-ros-auv-sim:latest
 
 # Note that env variables like $HOME cannot be unpacked here
 MOUNT_DIRS=(
@@ -19,4 +19,5 @@ MOUNT_DIRS=(
     "$HOME/.cache/matplotlib:/home/admin/.cache/matplotlib"
 )
 WORKDIR=/workspaces/isaac_ros-dev
-DOCKER_CONTEXT_DIR=$HOME/workspaces/isaac-ros-docker/
+DOCKER_CONTEXT_DIR=.
+DOCKER_BUILD_BASE_IMAGE=nvcr.io/nvidia/isaac/ros:isaac_ros_89df02a734965ed64c227ef531c09d65-amd64
