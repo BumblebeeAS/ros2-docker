@@ -48,10 +48,6 @@ sudo systemctl restart docker
 # Restart Docker
 sudo systemctl daemon-reload && sudo systemctl restart docker
 
-# Install Git LFS
-sudo apt-get install git-lfs
-git lfs install --skip-repo
-
 # Create workspace
 TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 TARGET_BASHRC="$TARGET_HOME/.bashrc"
