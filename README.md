@@ -181,25 +181,25 @@ outside of the script.
 
 1. Choose or create an environment in the `environments` folder.
 
-2. Install the `ros2-docker` executable and select the environment.
+2. Install the `ros2-docker` executable.
 
 ```bash
-./setup.sh <environment_name>
+./setup.sh
 ```
 
-For example, for the `auv4_orin` environment:
+3. Select an environment. For example, for the `auv4_orin` environment:
 
 ```bash
-./setup.sh auv4_orin
+ros2-docker use auv4_orin
 ```
 
-3. Build the docker images.
+4. Build the docker images.
 
 ```bash
 ros2-docker build
 ```
 
-4. Start the container and open a shell.
+5. Start the container and open a shell.
 
 ```bash
 ros2-docker start
