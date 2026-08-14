@@ -141,10 +141,12 @@ exec_in_container() {
 
     if [[ $# -gt 0 ]]; then
         printf "${INFO}Executing in %s: %s${NC}\n" "$CONTAINER_NAME" "$*"
-        docker exec -it --workdir "$WORKDIR" "$CONTAINER_NAME" bash -lc "$*"
+        docker exec -it -u admin \
+            --workdir "$WORKDIR" "$CONTAINER_NAME" bash -lc "$*"
     else
         printf "${INFO}Attaching to: %s${NC}\n" "$CONTAINER_NAME"
-        docker exec -it --workdir "$WORKDIR" "$CONTAINER_NAME" bash
+        docker exec -it -u admin \
+            --workdir "$WORKDIR" "$CONTAINER_NAME" bash
     fi
 }
 
@@ -159,9 +161,8 @@ up() {
     fi
     ensure_image_exists || return 1
 
-    local container_user="${ROS_DOCKER_CONTAINER_USER:-admin}"
     if command -v xhost >/dev/null 2>&1; then
-        xhost "+SI:localuser:${container_user}" >/dev/null 2>&1 || true
+        xhost "+SI:localuser:admin" >/dev/null 2>&1 || true
     fi
 
     local -a docker_args=(
@@ -185,7 +186,7 @@ up() {
         --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh
     )
 
-    [[ -f "$HOME/.Xauthority" ]] && docker_args+=( -v "$HOME/.Xauthority:/home/${container_user}/.Xauthority:rw" )
+    [[ -f "$HOME/.Xauthority" ]] && docker_args+=( -v "$HOME/.Xauthority:/home/admin/.Xauthority:rw" )
     if [[ -n "${SSH_AUTH_SOCK:-}" && -S "$SSH_AUTH_SOCK" ]]; then
         docker_args+=( -v "$SSH_AUTH_SOCK:/ssh-agent" -e SSH_AUTH_SOCK=/ssh-agent )
     fi
@@ -216,11 +217,10 @@ up() {
 }
 
 down() {
-    local container_user="${ROS_DOCKER_CONTAINER_USER:-admin}"
     docker stop "$CONTAINER_NAME" >/dev/null 2>&1 || true
     docker rm "$CONTAINER_NAME" >/dev/null 2>&1 || true
     if command -v xhost >/dev/null 2>&1; then
-        xhost "-SI:localuser:${container_user}" >/dev/null 2>&1 || true
+        xhost "-SI:localuser:admin" >/dev/null 2>&1 || true
     fi
     printf "${SUCCESS}Stopped: %s${NC}\n" "$CONTAINER_NAME"
 }
