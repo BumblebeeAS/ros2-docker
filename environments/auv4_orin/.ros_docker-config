@@ -1,23 +1,23 @@
 BUILD_IMAGE_FLAG=1
 
 # These parameters are only relevant if BUILD_IMAGE_FLAG=1
-# CuDNN is in the Isaac ROS x86_64 image but not in the JP6 image for some reason.
-CONFIG_IMAGE_KEY=ros2_humble.ultralytics_cuda.spinnaker.cudnn.ccache.auv4_orin.install_env
+CONFIG_IMAGE_KEY=noble_pip.ultralytics_cuda.spinnaker.ccache.auv4_orin.install_env.ros2_python_pins
 CONFIG_DOCKER_SEARCH_DIRS=(
-    "$HOME/workspaces/isaac-ros-docker/dockerfiles/common"
-    "$HOME/workspaces/isaac-ros-docker/dockerfiles/environments"
-    "$HOME/workspaces/isaac-ros-docker/dockerfiles/isaac_ros_jp6"
+    "dockerfiles/common"
+    "dockerfiles/environments"
+    "dockerfiles/arm64"
 )
 
 # Runs built image if BUILD_IMAGE_FLAG=0
-BUILT_IMAGE=isaac_ros_dev-aarch64:latest
+BUILT_IMAGE=isaac-ros-auv4-orin:latest
 
 # Note that env variables like $HOME cannot be unpacked here
 MOUNT_DIRS=(
     "$HOME/workspaces/isaac_ros-dev:/workspaces/isaac_ros-dev"
     "$HOME/.cache/ccache:/home/admin/.cache/ccache"
-    "$HOME/.cache/torch:/home/admin/.cache/torch" 
+    "$HOME/.cache/torch:/home/admin/.cache/torch"
     "$HOME/.cache/matplotlib:/home/admin/.cache/matplotlib"
 )
 WORKDIR=/workspaces/isaac_ros-dev
-DOCKER_CONTEXT_DIR=$HOME/workspaces/isaac-ros-docker/
+DOCKER_CONTEXT_DIR=.
+DOCKER_BUILD_BASE_IMAGE=nvcr.io/nvidia/isaac/ros:isaac_ros_89df02a734965ed64c227ef531c09d65-arm64-jetpack
