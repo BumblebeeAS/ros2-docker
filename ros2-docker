@@ -38,10 +38,9 @@ find_project_root() {
 }
 
 PROJECT_ROOT=$(find_project_root)
-ENVIRONMENT_OVERRIDE=""
 
 usage() {
-    printf "Usage: ros2-docker [--environment <name>] <command> [options]\n"
+    printf "Usage: ros2-docker <command> [options]\n"
     printf "\nCommands:\n"
     printf "    use <environment>       Select the default environment.\n"
     printf "    environments            List available environments.\n"
@@ -77,12 +76,14 @@ select_environment() {
 }
 
 load_environment() {
-    ENVIRONMENT="${ENVIRONMENT_OVERRIDE:-${ROS_DOCKER_ENVIRONMENT:-$(cat "$ENVIRONMENT_FILE" 2>/dev/null || true)}}"
+    ENVIRONMENT="$(cat "$ENVIRONMENT_FILE" 2>/dev/null || true)"
+
     if [[ -z "$ENVIRONMENT" ]]; then
         printf '%b%s%b\n' "$ERROR" "No environment selected." "$NC" >&2
         printf '%b%s%b\n' "$INFO" "Run: ros2-docker use <environment>" "$NC" >&2
         exit 1
     fi
+    printf "${INFO}Environment: %s${NC}\n" "$ENVIRONMENT" >&2
 
     ENV_FILE="$PROJECT_ROOT/environments/$ENVIRONMENT/.ros_docker-config"
     if [[ ! -f "$ENV_FILE" ]]; then
@@ -115,7 +116,7 @@ ensure_image_exists() {
         fi
     fi
     if ! docker image inspect "$DOCKER_IMAGE_NAME" >/dev/null 2>&1; then
-        printf "${WARNING}Image '%s' not found. Build it with: ros2-docker --environment %s build${NC}\n" \
+        printf "${WARNING}Image '%s' not found. Build it with: ros2-docker use %s && ros2-docker build${NC}\n" \
             "$DOCKER_IMAGE_NAME" "$ENVIRONMENT"
         return 1
     fi
@@ -224,12 +225,6 @@ down() {
     fi
     printf "${SUCCESS}Stopped: %s${NC}\n" "$CONTAINER_NAME"
 }
-
-while [[ "${1:-}" == "--environment" || "${1:-}" == "-e" ]]; do
-    [[ -n "${2:-}" ]] || { printf '%b%s%b\n' "$ERROR" "--environment requires a value." "$NC" >&2; exit 1; }
-    ENVIRONMENT_OVERRIDE="$2"
-    shift 2
-done
 
 COMMAND="${1:-}"
 [[ -n "$COMMAND" ]] || { usage; exit 0; }
