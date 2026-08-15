@@ -32,7 +32,7 @@ find_project_root() {
         done
     done
 
-    printf '%b%s%b\n' "$ERROR" "Could not find the isaac-ros-docker project root." "$NC" >&2
+    printf '%b%s%b\n' "$ERROR" "Could not find the ros2-docker project root." "$NC" >&2
     printf '%b%s%b\n' "$INFO" "Set ROS_DOCKER_PROJECT_ROOT or rerun ./setup.sh." "$NC" >&2
     exit 1
 }

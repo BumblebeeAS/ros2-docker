@@ -1,4 +1,4 @@
-# Isaac ROS Docker <!-- omit from toc -->
+# ROS 2 Docker <!-- omit from toc -->
 
 A set of scripts to ease development with layered ROS 2 Docker containers, including [Isaac ROS](https://nvidia-isaac-ros.github.io/).
 
@@ -61,7 +61,7 @@ These are the latest versions as of 14 Aug 2026. Feel free to update accordingly
 
 ## Installation
 
-_For ease of installation, save this directory as `~/workspaces/isaac-ros-docker`._
+_For ease of installation, save this directory as `~/workspaces/ros2-docker`._
 
 ### Installation on Jetson
 
