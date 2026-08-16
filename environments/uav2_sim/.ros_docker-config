@@ -1,6 +1,4 @@
-BUILD_IMAGE_FLAG=1
-
-# These parameters are only relevant if BUILD_IMAGE_FLAG=1
+# Build parameters, used by ros2-docker build
 CONFIG_IMAGE_KEY=noble_pip.trt.ultralytics_cuda.micro_xrce_dds_agent.ccache.px4_gazebo.uav2_sim.install_env.ros2_python_pins
 CONFIG_DOCKER_SEARCH_DIRS=(
     "dockerfiles/common"
@@ -8,7 +6,6 @@ CONFIG_DOCKER_SEARCH_DIRS=(
     "dockerfiles/amd64"
 )
 
-# Runs built image if BUILD_IMAGE_FLAG=0
 BUILT_IMAGE=isaac-ros-uav2-sim:latest
 
 # Note that env variables like $HOME cannot be unpacked here

@@ -110,14 +110,8 @@ container_running() {
 
 ensure_image_exists() {
     if ! docker image inspect "$DOCKER_IMAGE_NAME" >/dev/null 2>&1; then
-        if [[ ${BUILD_IMAGE_FLAG:-1} -eq 1 ]]; then
-            printf "${INFO}Image '%s' not found; building it first.${NC}\n" "$DOCKER_IMAGE_NAME"
-            build_image
-        fi
-    fi
-    if ! docker image inspect "$DOCKER_IMAGE_NAME" >/dev/null 2>&1; then
-        printf "${WARNING}Image '%s' not found. Build it with: ros2-docker use %s && ros2-docker build${NC}\n" \
-            "$DOCKER_IMAGE_NAME" "$ENVIRONMENT"
+        printf "${WARNING}Image '%s' not found. Build it with: ros2-docker build${NC}\n" \
+            "$DOCKER_IMAGE_NAME"
         return 1
     fi
 }
