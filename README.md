@@ -47,10 +47,10 @@ Tip: start from the nearest environment and tune `rosdep-apt.list`, `rosdep-pip.
 
 We tested this repository on these configurations:
 
-| Scenario                       | Sample hardware                                          | Sample OS / platform           | Environments                    |
-| ------------------------------ | -------------------------------------------------------- | ------------------------------ | ------------------------------- |
-| Jetson development (`aarch64`) | Jetson Orin NX, AGX Orin or AGX Thor, 40 GB+ free disk   | JetPack 7 (Ubuntu 24.04 based) | `asv`, `auv`, `uav2` |
-| Workstation (`x86_64`)         | 8+ CPU cores, 16-32 GB RAM, NVIDIA GPU, 50 GB+ free disk | Ubuntu 24.04 LTS               | `auv_sim`, `uav2_sim`           |
+| Scenario                       | Sample hardware                                          | Sample OS / platform           | Environments          |
+| ------------------------------ | -------------------------------------------------------- | ------------------------------ | --------------------- |
+| Jetson development (`aarch64`) | Jetson Orin NX, AGX Orin or AGX Thor, 40 GB+ free disk   | JetPack 7 (Ubuntu 24.04 based) | `asv`, `auv`, `uav2`  |
+| Workstation (`x86_64`)         | 8+ CPU cores, 16-32 GB RAM, NVIDIA GPU, 50 GB+ free disk | Ubuntu 24.04 LTS               | `auv_sim`, `uav2_sim` |
 
 We tested on NVIDIA's Isaac ROS 4.6 images from the [NGC tag catalog](https://catalog.ngc.nvidia.com/orgs/nvidia/isaac/containers/ros/-/tags):
 
