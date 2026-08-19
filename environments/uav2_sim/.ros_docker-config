@@ -17,4 +17,4 @@ MOUNT_DIRS=(
 )
 WORKDIR=/workspaces/isaac_ros-dev
 DOCKER_CONTEXT_DIR=.
-DOCKER_BUILD_BASE_IMAGE=nvcr.io/nvidia/isaac/ros:isaac_ros_89df02a734965ed64c227ef531c09d65-amd64
+DOCKER_BUILD_BASE_IMAGE=nvcr.io/nvidia/isaac/ros:isaac_ros_de03e5dcb6796908b25f26e17c263ea5-amd64

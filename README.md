@@ -52,10 +52,10 @@ We tested this repository on these configurations:
 | Jetson development (`aarch64`) | Jetson Orin NX, AGX Orin or AGX Thor, 40 GB+ free disk   | JetPack 7 (Ubuntu 24.04 based) | `asv`, `auv`, `uav2` |
 | Workstation (`x86_64`)         | 8+ CPU cores, 16-32 GB RAM, NVIDIA GPU, 50 GB+ free disk | Ubuntu 24.04 LTS               | `auv_sim`, `uav2_sim`           |
 
-We tested on NVIDIA's Isaac ROS 4.5 images from the [NGC tag catalog](https://catalog.ngc.nvidia.com/orgs/nvidia/isaac/containers/ros/-/tags):
+We tested on NVIDIA's Isaac ROS 4.6 images from the [NGC tag catalog](https://catalog.ngc.nvidia.com/orgs/nvidia/isaac/containers/ros/-/tags):
 
-- `nvcr.io/nvidia/isaac/ros:isaac_ros_89df02a734965ed64c227ef531c09d65-amd64`
-- `nvcr.io/nvidia/isaac/ros:isaac_ros_89df02a734965ed64c227ef531c09d65-arm64-jetpack`
+- `nvcr.io/nvidia/isaac/ros:isaac_ros_de03e5dcb6796908b25f26e17c263ea5-amd64`
+- `nvcr.io/nvidia/isaac/ros:isaac_ros_de03e5dcb6796908b25f26e17c263ea5-arm64-jetpack`
 
 These are the latest versions as of 14 Aug 2026. Feel free to update accordingly.
 
