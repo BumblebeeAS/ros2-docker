@@ -5,6 +5,7 @@ libnlopt-dev
 libnlopt-cxx-dev
 lm-sensors
 ros-jazzy-ament-clang-format
+ros-jazzy-example-interfaces
 ros-jazzy-foxglove-compressed-video-transport
 ros-jazzy-foxglove-msgs
 ros-jazzy-geographic-msgs
@@ -18,6 +19,7 @@ python3-pytest
 python3-serial
 python3-ntplib
 python3-psutil
+python3-shapely
 ros-jazzy-isaac-ros-test
 ros-jazzy-isaac-ros-tensor-rt
 ros-jazzy-isaac-ros-dnn-image-encoder
@@ -27,7 +29,6 @@ ros-jazzy-isaac-ros-tensor-list-interfaces
 ros-jazzy-isaac-ros-nitros-tensor-list-type
 ros-jazzy-isaac-ros-common
 ros-jazzy-isaac-ros-nitros-image-type
-ros-jazzy-isaac-ros-nitros-camera-info-type
 ros-jazzy-rtcm-msgs
 ros-jazzy-nmea-msgs
 ros-jazzy-pcl-ros
@@ -40,3 +41,8 @@ libcurl4-openssl-dev
 cmake
 libpcap-dev
 ros-jazzy-point-cloud-transport
+ros-jazzy-point-cloud-interfaces
+ros-jazzy-image-pipeline
+lz4
+ros-jazzy-ouster-ros
+ros-jazzy-sbg-driver
