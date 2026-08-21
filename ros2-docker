@@ -145,6 +145,22 @@ exec_in_container() {
     fi
 }
 
+# `docker run -d` returns before workspace-entrypoint.sh has created the
+# container user, so an immediate `docker exec -u admin` dies with
+# "unable to find user admin". Group membership is handled by --group-add in
+# up(), so the passwd entry is the only thing left to wait for.
+wait_for_container_user() {
+    local deadline=$((SECONDS + 60))
+    while (( SECONDS < deadline )); do
+        if docker exec "$CONTAINER_NAME" id -u admin >/dev/null 2>&1; then
+            return 0
+        fi
+        sleep 0.1
+    done
+    printf "${WARNING}Timed out waiting for user 'admin' in %s.${NC}\n" "$CONTAINER_NAME" >&2
+    return 1
+}
+
 up() {
     if container_running; then
         printf "${INFO}%s is already running.${NC}\n" "$CONTAINER_NAME"
@@ -212,8 +228,31 @@ up() {
         [[ -S /run/jtop.sock ]] && docker_args+=( -v /run/jtop.sock:/run/jtop.sock:ro )
     fi
 
+    # Grant the container user the device groups by GID, resolved here on the
+    # host. Docker applies --group-add when it creates each process -- including
+    # `docker exec` ones -- without consulting the container's /etc/group, so
+    # this is immune to the entrypoint's asynchronous edits to that file, which
+    # `docker exec` would otherwise race. Same pattern upstream run_dev.py uses
+    # for jtop:
+    # https://github.com/NVIDIA-ISAAC-ROS/isaac-ros-cli/blob/release-4.6/scripts/run_dev/run_dev.py#L261-L270
+    local dev gid
+    local -a device_gids=()
+    for dev in /dev/dri/render* /dev/i2c-* /dev/gpiochip* /run/jtop.sock; do
+        [[ -e "$dev" ]] || continue
+        gid=$(stat -c %g "$dev" 2>/dev/null) || continue
+        [[ "$gid" == "0" ]] && continue                        # root-owned: no group to join
+        [[ " ${device_gids[*]-} " == *" $gid "* ]] && continue  # dedupe (14x i2c, 3x render)
+        device_gids+=( "$gid" )
+    done
+    for gid in ${device_gids[@]+"${device_gids[@]}"}; do
+        docker_args+=( --group-add "$gid" )
+    done
+
     printf "${INFO}Starting %s from %s${NC}\n" "$CONTAINER_NAME" "$DOCKER_IMAGE_NAME"
-    docker run -d "${docker_args[@]}" "$DOCKER_IMAGE_NAME" tail -f /dev/null
+    # `|| return 1` keeps a failed `docker run` propagating out of up(); without
+    # it up() would return wait_for_container_user's status and mask the failure.
+    docker run -d "${docker_args[@]}" "$DOCKER_IMAGE_NAME" tail -f /dev/null || return 1
+    wait_for_container_user
 }
 
 down() {
