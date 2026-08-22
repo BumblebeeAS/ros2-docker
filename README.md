@@ -7,7 +7,7 @@ A set of scripts to ease development with layered ROS 2 Docker containers, inclu
 - [Installation](#installation)
   - [Installation on Jetson](#installation-on-jetson)
   - [Installation on x86\_64](#installation-on-x86_64)
-- [Build Isaac ROS Docker Image](#build-isaac-ros-docker-image)
+- [Build a ROS 2 Docker Image](#build-a-ros-2-docker-image)
 - [Production](#production)
 - [ROS Dependencies](#ros-dependencies)
 - [Notes](#notes)
@@ -21,9 +21,9 @@ All environments use a common runtime setup (`dockerfiles/environments/Dockerfil
 - Base tooling: `tmux`, `tmuxp`, `colcon-clean`, `foxglove-bridge`, `speedtest-cli`
 - Per-environment shell setup: `.bashrc`, `.bash_aliases`, `on_entry.sh`
 - Per-environment ROS dependencies: `rosdep-apt.list`, `rosdep-pip.list`
-- Shared mounts: `isaac_ros-dev` workspace and cache directories (`ccache`, `torch`, `matplotlib`)
+- Environment-defined workspace and cache mounts
 
-All environments come with a GPU-accelerated vision stack utilizing TensorRT optimized for edge inference on Jetsons.
+The Isaac ROS environments come with a GPU-accelerated vision stack utilizing TensorRT optimized for edge inference on Jetsons.
 
 Environment-specific differences come from the `CONFIG_IMAGE_KEY` chain in each `.ros_docker-config`.
 
@@ -40,6 +40,7 @@ We deploy on three types of vehicles:
 | `auv_sim`   | AUV simulation with [DAVE Sim](https://field-robotics-lab.github.io/dave.doc/) + Gazebo |                                                                        |
 | `uav2`      | UAV software stack on Jetson                                                            | PX4 DDS bridge support via Micro XRCE-DDS Agent, Argus camera support  |
 | `uav2_sim`  | UAV simulation with PX4 + Gazebo                                                        | PX4 Autopilot SITL + Gazebo, MAVSDK tooling                            |
+| `bluerov_ws` | BlueROV simulation demos from [BumblebeeAS/examples](https://github.com/BumblebeeAS/examples) | Standard ROS Jazzy image, ArduSub/Gazebo base, CUDA perception stack  |
 
 Tip: start from the nearest environment and tune `rosdep-apt.list`, `rosdep-pip.list`, and `CONFIG_IMAGE_KEY` for your project.
 
@@ -177,7 +178,7 @@ outside of the script.
 
 </details>
 
-## Build Isaac ROS Docker Image
+## Build a ROS 2 Docker Image
 
 1. Choose or create an environment in the `environments` folder.
 
