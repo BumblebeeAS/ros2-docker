@@ -178,7 +178,7 @@ up() {
 
     # Container arguments mirror upstream Isaac ROS run_dev.py:
     # https://github.com/NVIDIA-ISAAC-ROS/isaac-ros-cli/blob/release-4.6/scripts/run_dev/run_dev.py
-    local -a docker_args=(
+    local -a DOCKER_ARGS=(
         --name "$CONTAINER_NAME"
         --network host
         --ipc host
@@ -199,9 +199,9 @@ up() {
         --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh
     )
 
-    [[ -f "$HOME/.Xauthority" ]] && docker_args+=( -v "$HOME/.Xauthority:/home/admin/.Xauthority:rw" )
+    [[ -f "$HOME/.Xauthority" ]] && DOCKER_ARGS+=( -v "$HOME/.Xauthority:/home/admin/.Xauthority:rw" )
     if [[ -n "${SSH_AUTH_SOCK:-}" && -S "$SSH_AUTH_SOCK" ]]; then
-        docker_args+=( -v "$SSH_AUTH_SOCK:/ssh-agent" -e SSH_AUTH_SOCK=/ssh-agent )
+        DOCKER_ARGS+=( -v "$SSH_AUTH_SOCK:/ssh-agent" -e SSH_AUTH_SOCK=/ssh-agent )
     fi
     local mount_source
     for mount_dir in "${MOUNT_DIRS[@]}"; do
@@ -209,7 +209,7 @@ up() {
         if [[ "$mount_source" = /* && ! -e "$mount_source" ]]; then
             mkdir -p "$mount_source"
         fi
-        docker_args+=( -v "$mount_dir" )
+        DOCKER_ARGS+=( -v "$mount_dir" )
     done
 
     # Matches
@@ -217,15 +217,15 @@ up() {
     # Skip the /dev/input and /dev/bus/usb mounts and the --device=/dev/coe-chan-*
     # flags in upstream run_dev.py: we bind-mount all of /dev instead
     if [[ "$(uname -m)" == "aarch64" ]]; then
-        docker_args+=( --pid host )
+        DOCKER_ARGS+=( --pid host )
         # /sys/kernel/debug is required by tegrastats
-        [[ -e /usr/bin/tegrastats ]] && docker_args+=( -v /usr/bin/tegrastats:/usr/bin/tegrastats -v /sys/kernel/debug:/sys/kernel/debug:ro )
-        [[ -d /usr/lib/aarch64-linux-gnu/tegra ]] && docker_args+=( -v /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra )
-        [[ -d /usr/src/jetson_multimedia_api ]] && docker_args+=( -v /usr/src/jetson_multimedia_api:/usr/src/jetson_multimedia_api )
-        [[ -d /usr/src/jetson_sipl_api ]] && docker_args+=( -v /usr/src/jetson_sipl_api:/usr/src/jetson_sipl_api )
-        [[ -d /usr/share/vpi3 ]] && docker_args+=( -v /usr/share/vpi3:/usr/share/vpi3 )
-        [[ -d /usr/share/vpi4 ]] && docker_args+=( -v /usr/share/vpi4:/usr/share/vpi4 )
-        [[ -S /run/jtop.sock ]] && docker_args+=( -v /run/jtop.sock:/run/jtop.sock:ro )
+        [[ -e /usr/bin/tegrastats ]] && DOCKER_ARGS+=( -v /usr/bin/tegrastats:/usr/bin/tegrastats -v /sys/kernel/debug:/sys/kernel/debug:ro )
+        [[ -d /usr/lib/aarch64-linux-gnu/tegra ]] && DOCKER_ARGS+=( -v /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra )
+        [[ -d /usr/src/jetson_multimedia_api ]] && DOCKER_ARGS+=( -v /usr/src/jetson_multimedia_api:/usr/src/jetson_multimedia_api )
+        [[ -d /usr/src/jetson_sipl_api ]] && DOCKER_ARGS+=( -v /usr/src/jetson_sipl_api:/usr/src/jetson_sipl_api )
+        [[ -d /usr/share/vpi3 ]] && DOCKER_ARGS+=( -v /usr/share/vpi3:/usr/share/vpi3 )
+        [[ -d /usr/share/vpi4 ]] && DOCKER_ARGS+=( -v /usr/share/vpi4:/usr/share/vpi4 )
+        [[ -S /run/jtop.sock ]] && DOCKER_ARGS+=( -v /run/jtop.sock:/run/jtop.sock:ro )
     fi
 
     # Grant the container user the device groups by GID, resolved here on the
@@ -245,13 +245,14 @@ up() {
         device_gids+=( "$gid" )
     done
     for gid in ${device_gids[@]+"${device_gids[@]}"}; do
-        docker_args+=( --group-add "$gid" )
+        DOCKER_ARGS+=( --group-add "$gid" )
     done
 
     printf "${INFO}Starting %s from %s${NC}\n" "$CONTAINER_NAME" "$DOCKER_IMAGE_NAME"
-    # `|| return 1` keeps a failed `docker run` propagating out of up(); without
-    # it up() would return wait_for_container_user's status and mask the failure.
-    docker run -d "${docker_args[@]}" "$DOCKER_IMAGE_NAME" tail -f /dev/null || return 1
+    # errexit is off in `up`'s callers, so without `|| return 1` a failed
+    # `docker run` would fall through and up() would return
+    # wait_for_container_user's status, masking the failure.
+    docker run -d "${DOCKER_ARGS[@]}" "$DOCKER_IMAGE_NAME" tail -f /dev/null || return 1
     wait_for_container_user
 }
 
