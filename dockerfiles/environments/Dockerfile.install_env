@@ -10,6 +10,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     iproute2 \
     ncdu \
     ros-${ROS_DISTRO}-foxglove-bridge \
+    speedtest-cli \
     tmux \
     vim \
     htop \
