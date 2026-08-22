@@ -12,6 +12,7 @@ RUN git clone --recursive https://github.com/jrl-umi3218/eigen-quadprog /tmp/eig
   cd _build && \
   cmake .. && \
   make -j"$(nproc)" && \
+  ctest --output-on-failure && \
   make install && \
   ldconfig && \
   rm -rf /tmp/eigen-quadprog
