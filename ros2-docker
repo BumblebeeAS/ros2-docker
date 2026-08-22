@@ -12,6 +12,11 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ros-docker"
 PROJECT_ROOT_FILE="$CONFIG_DIR/project_root"
 ENVIRONMENT_FILE="$CONFIG_DIR/environment"
+READY_FILE=/tmp/.ros2-docker-ready
+ISAAC_ROS_DOCKER_ARGS=(
+    -e ISAAC_ROS_WS=/workspaces/isaac_ros-dev
+    --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh
+)
 
 find_project_root() {
     local candidate dir
@@ -121,11 +126,19 @@ build_image() {
         printf "${WARNING}%s is running. Stop it first with: ros2-docker down${NC}\n" "$CONTAINER_NAME"
         exit 1
     fi
+
+    local -a build_args=(
+        --config "$ENV_FILE"
+        --build_arg "HOST_USER_UID=$(id -u)"
+        --build_arg "HOST_USER_GID=$(id -g)"
+    )
+
     case "${1:-}" in
-        "") "$PROJECT_ROOT/build_image_layers.sh" --config "$ENV_FILE" ;;
-        -r | --rebuild) "$PROJECT_ROOT/build_image_layers.sh" --config "$ENV_FILE" --rebuild ;;
+        "") ;;
+        -r | --rebuild) build_args+=(--rebuild) ;;
         *) printf "${ERROR}Invalid build option: %s${NC}\n" "$1" >&2; exit 1 ;;
     esac
+    "$PROJECT_ROOT/build_image_layers.sh" "${build_args[@]}"
 }
 
 exec_in_container() {
@@ -145,19 +158,11 @@ exec_in_container() {
     fi
 }
 
-# `docker run -d` returns before workspace-entrypoint.sh has created the
-# container user, so an immediate `docker exec -u admin` dies with
-# "unable to find user admin". Group membership is handled by --group-add in
-# up(), so the passwd entry is the only thing left to wait for.
-wait_for_container_user() {
-    local deadline=$((SECONDS + 60))
-    while (( SECONDS < deadline )); do
-        if docker exec "$CONTAINER_NAME" id -u admin >/dev/null 2>&1; then
-            return 0
-        fi
-        sleep 0.1
-    done
-    printf "${WARNING}Timed out waiting for user 'admin' in %s.${NC}\n" "$CONTAINER_NAME" >&2
+# The requested command touches READY_FILE after the image entrypoint hands off.
+wait_for_entrypoint() {
+    timeout 60 docker exec "$CONTAINER_NAME" \
+        bash -c "until [ -e $READY_FILE ]; do sleep 0.1; done" >/dev/null 2>&1 && return 0
+    printf "${WARNING}Timed out waiting for %s to finish starting.${NC}\n" "$CONTAINER_NAME" >&2
     return 1
 }
 
@@ -173,7 +178,7 @@ up() {
     ensure_image_exists || return 1
 
     if command -v xhost >/dev/null 2>&1; then
-        xhost "+SI:localuser:admin" >/dev/null 2>&1 || true
+        xhost "+SI:localuser:$(id -un)" >/dev/null 2>&1 || true
     fi
 
     # Container arguments mirror upstream Isaac ROS run_dev.py:
@@ -188,7 +193,6 @@ up() {
         -e NVIDIA_VISIBLE_DEVICES=all
         -e NVIDIA_DRIVER_CAPABILITIES=all
         -e "ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}"
-        -e ISAAC_ROS_WS=/workspaces/isaac_ros-dev
         -e "HOST_USER_UID=$(id -u)"
         -e "HOST_USER_GID=$(id -g)"
         -v /tmp/.X11-unix:/tmp/.X11-unix
@@ -196,10 +200,11 @@ up() {
         -v /dev:/dev
         -v /run/udev:/run/udev:ro
         --group-add video
-        --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh
     )
+    DOCKER_ARGS+=( "${ISAAC_ROS_DOCKER_ARGS[@]}" )
 
     [[ -f "$HOME/.Xauthority" ]] && DOCKER_ARGS+=( -v "$HOME/.Xauthority:/home/admin/.Xauthority:rw" )
+    [[ -f "$HOME/.gitconfig" ]] && DOCKER_ARGS+=( -v "$HOME/.gitconfig:/home/admin/.gitconfig:ro" )
     if [[ -n "${SSH_AUTH_SOCK:-}" && -S "$SSH_AUTH_SOCK" ]]; then
         DOCKER_ARGS+=( -v "$SSH_AUTH_SOCK:/ssh-agent" -e SSH_AUTH_SOCK=/ssh-agent )
     fi
@@ -251,16 +256,17 @@ up() {
     printf "${INFO}Starting %s from %s${NC}\n" "$CONTAINER_NAME" "$DOCKER_IMAGE_NAME"
     # errexit is off in `up`'s callers, so without `|| return 1` a failed
     # `docker run` would fall through and up() would return
-    # wait_for_container_user's status, masking the failure.
-    docker run -d "${DOCKER_ARGS[@]}" "$DOCKER_IMAGE_NAME" tail -f /dev/null || return 1
-    wait_for_container_user
+    # wait_for_entrypoint's status, masking the failure.
+    docker run -d "${DOCKER_ARGS[@]}" "$DOCKER_IMAGE_NAME" \
+        bash -c "touch $READY_FILE; exec tail -f /dev/null" || return 1
+    wait_for_entrypoint
 }
 
 down() {
     docker stop "$CONTAINER_NAME" >/dev/null 2>&1 || true
     docker rm "$CONTAINER_NAME" >/dev/null 2>&1 || true
     if command -v xhost >/dev/null 2>&1; then
-        xhost "-SI:localuser:admin" >/dev/null 2>&1 || true
+        xhost "-SI:localuser:$(id -un)" >/dev/null 2>&1 || true
     fi
     printf "${SUCCESS}Stopped: %s${NC}\n" "$CONTAINER_NAME"
 }
