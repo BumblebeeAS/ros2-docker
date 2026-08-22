@@ -1,6 +1,8 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
+ARG ROS_DISTRO=jazzy
+
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt-get update -y || true && \
@@ -8,20 +10,20 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   # OpenCV
   python3-opencv \
   # Isaac ROS vision utils
-  ros-humble-isaac-ros-test \
-  ros-humble-isaac-ros-argus-camera \
-  ros-humble-isaac-ros-image-pipeline \
+  ros-${ROS_DISTRO}-isaac-ros-test \
+  ros-${ROS_DISTRO}-isaac-ros-argus-camera \
+  ros-${ROS_DISTRO}-isaac-ros-image-pipeline \
   # Compression
-  ros-humble-isaac-ros-h264-encoder \
-  ros-humble-isaac-ros-h264-decoder \
+  ros-${ROS_DISTRO}-isaac-ros-h264-encoder \
+  ros-${ROS_DISTRO}-isaac-ros-h264-decoder \
   # YOLO
-  ros-humble-isaac-ros-yolov8 \
-  ros-humble-isaac-ros-tensor-rt \
-  ros-humble-isaac-ros-dnn-image-encoder \
-  ros-humble-isaac-ros-nitros-detection2-d-array-type \
-  ros-humble-isaac-ros-triton \
+  ros-${ROS_DISTRO}-isaac-ros-yolov8 \
+  ros-${ROS_DISTRO}-isaac-ros-tensor-rt \
+  ros-${ROS_DISTRO}-isaac-ros-dnn-image-encoder \
+  ros-${ROS_DISTRO}-isaac-ros-nitros-detection2-d-array-type \
+  ros-${ROS_DISTRO}-isaac-ros-triton \
   # Foxglove
-  ros-humble-foxglove-bridge
+  ros-${ROS_DISTRO}-foxglove-bridge
 
 # NOTES:
-# ros-humble-isaac-ros-test is for building packages
+# isaac_ros_test is required when building Isaac ROS packages from source.

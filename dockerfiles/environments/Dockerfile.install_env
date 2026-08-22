@@ -1,15 +1,20 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
+ARG ROS_DISTRO=jazzy
+
 # Apt packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y \
     iproute2 \
     ncdu \
-    ros-humble-foxglove-bridge \
+    ros-${ROS_DISTRO}-foxglove-bridge \
     speedtest-cli \
-    tmux
+    tmux \
+    vim \
+    htop \
+    nload
 
 # Pip packages
 RUN --mount=type=cache,target=/root/.cache/pip \
@@ -49,10 +54,15 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 COPY ${LOCAL_ENV_FOLDER}/rosdep-apt.list \
     ${LOCAL_ENV_FOLDER}/rosdep-pip.list \
     /tmp/
+
+# Mount pip cache since some apt packages executes pip during installation
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && xargs -a /tmp/rosdep-apt.list apt-get install -y \
+    --mount=type=cache,target=/root/.cache/pip \
+    apt-get update \
+    && xargs -a /tmp/rosdep-apt.list apt-get install -y \
     && rm /tmp/rosdep-apt.list
+
 RUN --mount=type=cache,target=/root/.cache/pip \
     xargs -a /tmp/rosdep-pip.list pip3 install -U \
     && rm /tmp/rosdep-pip.list

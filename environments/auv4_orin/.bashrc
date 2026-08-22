@@ -10,11 +10,11 @@ if [ -d /etc/profile.d ]; then
   unset i
 fi
 
-# ROS2 Humble
-source /opt/ros/humble/setup.bash
+# ROS 2 Jazzy
+source /opt/ros/jazzy/setup.bash
 
 # # Fast DDS Discovery Server
-# # Source https://docs.ros.org/en/humble/Tutorials/Advanced/Discovery-Server/Discovery-Server.html
+# # Source https://docs.ros.org/en/jazzy/Tutorials/Advanced/Discovery-Server/Discovery-Server.html
 # # Does not work when there are too many nodes, not sure why
 # BRING_UP_PATH=/workspaces/isaac_ros-dev/src/bring-up
 # export FASTRTPS_DEFAULT_PROFILES_FILE=$BRING_UP_PATH/etc/fastdds_supeclient.xml

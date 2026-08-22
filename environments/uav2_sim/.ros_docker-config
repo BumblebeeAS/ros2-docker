@@ -1,0 +1,20 @@
+# Build parameters, used by ros2-docker build
+CONFIG_IMAGE_KEY=noble_pip.ultralytics_cuda.micro_xrce_dds_agent.ccache.px4_gazebo.uav2_sim.install_env.ros2_python_pins
+CONFIG_DOCKER_SEARCH_DIRS=(
+    "dockerfiles/common"
+    "dockerfiles/environments"
+    "dockerfiles/amd64"
+)
+
+BUILT_IMAGE=isaac-ros-uav2-sim:latest
+
+# Note that env variables like $HOME cannot be unpacked here
+MOUNT_DIRS=(
+    "$HOME/workspaces/isaac_ros-dev:/workspaces/isaac_ros-dev"
+    "$HOME/.cache/ccache:/home/admin/.cache/ccache"
+    "$HOME/.cache/torch:/home/admin/.cache/torch"
+    "$HOME/.cache/matplotlib:/home/admin/.cache/matplotlib"
+)
+WORKDIR=/workspaces/isaac_ros-dev
+DOCKER_CONTEXT_DIR=.
+DOCKER_BUILD_BASE_IMAGE=nvcr.io/nvidia/isaac/ros:isaac_ros_de03e5dcb6796908b25f26e17c263ea5-amd64
