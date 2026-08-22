@@ -1,0 +1,7 @@
+imutils
+kornia
+rich
+scikit-learn
+shapely
+supervision
+typer

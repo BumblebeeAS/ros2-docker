@@ -101,7 +101,7 @@ load_environment() {
     # Keep the runtime implementation explicit while retaining the established
     # isaac_ros_common configuration names in each environment file.
     ENVIRONMENT_NAME="${ENVIRONMENT_NAME:-$ENVIRONMENT}"
-    CONTAINER_NAME="${CONTAINER_NAME:-isaac-ros-${ENVIRONMENT_NAME//_/-}}"
+    CONTAINER_NAME="${CONTAINER_NAME:-${ENVIRONMENT_NAME//_/-}}"
     DOCKER_IMAGE_NAME="$BUILT_IMAGE"
 }
 

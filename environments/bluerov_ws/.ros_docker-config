@@ -1,0 +1,20 @@
+# Container layers moved from BumblebeeAS/examples and BumblebeeAS/ardusub_sim,
+# upgraded to ROS 2 Jazzy, and composed with reusable layers from this project.
+CONFIG_IMAGE_KEY=apt_cache.noble_pip.ultralytics_cuda.ardusub_sim.bluerov_ws.install_env.ros2_python_pins.osrf_user
+CONFIG_DOCKER_SEARCH_DIRS=(
+    "dockerfiles/common"
+    "dockerfiles/amd64"
+    "dockerfiles/environments"
+)
+
+BUILT_IMAGE=bluerov_ws:jazzy
+
+# Inherit /ros_entrypoint.sh instead of using Isaac ROS workspace initialization.
+ISAAC_ROS_DOCKER_ARGS=()
+
+MOUNT_DIRS=(
+    "$HOME/workspaces/bluerov_ws:/home/admin/workspaces/bluerov_ws"
+)
+WORKDIR=/home/admin/workspaces/bluerov_ws
+DOCKER_CONTEXT_DIR=.
+DOCKER_BUILD_BASE_IMAGE=ros:jazzy-ros-base-noble
