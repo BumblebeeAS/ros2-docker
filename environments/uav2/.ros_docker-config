@@ -1,5 +1,5 @@
 # Build parameters, used by ros2-docker build
-CONFIG_IMAGE_KEY=noble_pip.ultralytics_cuda.micro_xrce_dds_agent.ccache.uav2.install_env.ros2_python_pins
+CONFIG_IMAGE_KEY=apt_cache.noble_pip.ultralytics_cuda.micro_xrce_dds_agent.ccache.uav2.install_env.ros2_python_pins
 CONFIG_DOCKER_SEARCH_DIRS=(
     "dockerfiles/common"
     "dockerfiles/environments"
