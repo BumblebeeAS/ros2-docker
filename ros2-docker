@@ -21,7 +21,7 @@ ISAAC_ROS_DOCKER_ARGS=(
 find_project_root() {
     local candidate dir
     for candidate in "${ROS_DOCKER_PROJECT_ROOT:-}" "$(cat "$PROJECT_ROOT_FILE" 2>/dev/null || true)"; do
-        if [[ -n "$candidate" && -f "$candidate/build_image_layers.sh" ]]; then
+        if [[ -n "$candidate" && -f "$candidate/build_image_layers.py" ]]; then
             printf "%s" "$candidate"
             return
         fi
@@ -29,7 +29,7 @@ find_project_root() {
 
     for dir in "$SCRIPT_DIR" "$PWD"; do
         while [[ "$dir" != "/" ]]; do
-            if [[ -f "$dir/build_image_layers.sh" ]]; then
+            if [[ -f "$dir/build_image_layers.py" ]]; then
                 printf "%s" "$dir"
                 return
             fi
@@ -138,7 +138,7 @@ build_image() {
         -r | --rebuild) build_args+=(--rebuild) ;;
         *) printf "${ERROR}Invalid build option: %s${NC}\n" "$1" >&2; exit 1 ;;
     esac
-    "$PROJECT_ROOT/build_image_layers.sh" "${build_args[@]}"
+    "$PROJECT_ROOT/build_image_layers.py" "${build_args[@]}"
 }
 
 exec_in_container() {
