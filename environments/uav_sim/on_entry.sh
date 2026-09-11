@@ -8,13 +8,13 @@
 set -e
 
 PX4_AUTOPILOT_DIR=$HOME/PX4-Autopilot
-UAV2_SIM_DIR=/workspaces/isaac_ros-dev
+UAV_SIM_DIR=/workspaces/isaac_ros-dev
 PX4_AUTOPILOT_GZ_DIR=${PX4_AUTOPILOT_DIR}/Tools/simulation/gz
 PX4_AUTOPILOT_MODEL_DIR=${PX4_AUTOPILOT_GZ_DIR}/models/uav2
 PX4_AUTOPILOT_AIRFRAMES_DIR=${PX4_AUTOPILOT_DIR}/ROMFS/px4fmu_common/init.d-posix/airframes/
-UAV2_DESC_URDF_DIR=${UAV2_SIM_DIR}/install/uav2_description/share/uav2_description/urdf
-ETC_DIR=${UAV2_SIM_DIR}/src/bring-up/etc/uav2_sim
-WORLDS_DIR=${UAV2_SIM_DIR}/src/bb_worlds/worlds
+UAV2_DESC_URDF_DIR=${UAV_SIM_DIR}/install/uav2_description/share/uav2_description/urdf
+ETC_DIR=${UAV_SIM_DIR}/src/bring-up/etc/uav_sim
+WORLDS_DIR=${UAV_SIM_DIR}/src/bb_worlds/worlds
 
 mkdir -p "${PX4_AUTOPILOT_MODEL_DIR}"
 gz sdf -p "${UAV2_DESC_URDF_DIR}/uav2.urdf" > "${PX4_AUTOPILOT_MODEL_DIR}/model.sdf"
