@@ -1,0 +1,23 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+# Sources:
+# https://developer.nvidia.com/embedded/jetpack/downloads/archive-7.0
+# https://docs.nvidia.com/deeplearning/cudnn/installation/latest/linux.html
+#
+# JetPack 7 aligns the Jetson software stack with SBSA. This layer uses the
+# unified CUDA 13 SBSA repository instead of the aarch64-jetson repository.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        wget \
+    && wget -q \
+        https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/sbsa/cuda-keyring_1.1-1_all.deb \
+        -O /tmp/cuda-keyring.deb \
+    && dpkg -i /tmp/cuda-keyring.deb \
+    && rm /tmp/cuda-keyring.deb \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        zlib1g \
+        cudnn9-cuda-13

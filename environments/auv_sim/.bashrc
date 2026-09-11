@@ -1,6 +1,11 @@
 
-# ROS2 Humble
-source /opt/ros/humble/setup.bash
+# ROS 2 Jazzy
+source /opt/ros/jazzy/setup.bash
+
+# DAVE simulation workspace
+if [ -f /opt/dave_ws/install/setup.bash ]; then
+    source /opt/dave_ws/install/setup.bash
+fi
 
 # Custom ROS2 workspaces
 if [ -f /workspaces/isaac_ros-dev/install/setup.bash ]; then

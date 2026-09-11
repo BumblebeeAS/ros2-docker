@@ -1,0 +1,5 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+ENV LOCAL_ENV_FOLDER=environments/bluerov_ws
+ENV USERNAME=admin

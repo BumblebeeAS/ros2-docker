@@ -1,6 +1,8 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
+ARG ROS_DISTRO=jazzy
+
 WORKDIR /home/${USERNAME}
 RUN git clone --recurse-submodules -b v1.16.0 \
     https://github.com/PX4/PX4-Autopilot.git
@@ -41,4 +43,4 @@ RUN chown -R 1000:1000 /home/${USERNAME}/PX4-Autopilot
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y \
-    ros-humble-ros-gzharmonic-bridge
+    ros-${ROS_DISTRO}-ros-gz-bridge

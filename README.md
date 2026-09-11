@@ -1,13 +1,13 @@
-# Isaac ROS Docker <!-- omit from toc -->
+# ROS 2 Docker <!-- omit from toc -->
 
-A set of scripts to ease development with [Isaac ROS Docker containers](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_common/index.html).
+A set of scripts to ease development with layered ROS 2 Docker containers, including [Isaac ROS](https://nvidia-isaac-ros.github.io/).
 
 - [Available Environments](#available-environments)
 - [Sample Hardware and OS Requirements](#sample-hardware-and-os-requirements)
 - [Installation](#installation)
   - [Installation on Jetson](#installation-on-jetson)
   - [Installation on x86\_64](#installation-on-x86_64)
-- [Build Isaac ROS Docker Image](#build-isaac-ros-docker-image)
+- [Build a ROS 2 Docker Image](#build-a-ros-2-docker-image)
 - [Production](#production)
 - [ROS Dependencies](#ros-dependencies)
 - [Notes](#notes)
@@ -21,11 +21,11 @@ All environments use a common runtime setup (`dockerfiles/environments/Dockerfil
 - Base tooling: `tmux`, `tmuxp`, `colcon-clean`, `foxglove-bridge`, `speedtest-cli`
 - Per-environment shell setup: `.bashrc`, `.bash_aliases`, `on_entry.sh`
 - Per-environment ROS dependencies: `rosdep-apt.list`, `rosdep-pip.list`
-- Shared mounts: `isaac_ros-dev` workspace and cache directories (`ccache`, `torch`, `matplotlib`)
+- Environment-defined workspace and cache mounts
 
-All environments come with a GPU-accelerated vision stack utilizing TensorRT optimized for edge inference on Jetsons.
+The Isaac ROS environments come with a GPU-accelerated vision stack utilizing TensorRT optimized for edge inference on Jetsons.
 
-Environment-specific differences come from the `CONFIG_IMAGE_KEY` chain in each `.isaac_ros_common-config`.
+Environment-specific differences come from the `CONFIG_IMAGE_KEY` chain in each `.ros_docker-config`.
 
 We deploy on three types of vehicles:
 
@@ -40,6 +40,7 @@ We deploy on three types of vehicles:
 | `auv_sim`   | AUV simulation with [DAVE Sim](https://field-robotics-lab.github.io/dave.doc/) + Gazebo |                                                                        |
 | `uav2`      | UAV software stack on Jetson                                                            | PX4 DDS bridge support via Micro XRCE-DDS Agent, Argus camera support  |
 | `uav2_sim`  | UAV simulation with PX4 + Gazebo                                                        | PX4 Autopilot SITL + Gazebo, MAVSDK tooling                            |
+| `bluerov_ws` | BlueROV simulation demos from [BumblebeeAS/examples](https://github.com/BumblebeeAS/examples) | Standard ROS Jazzy image, ArduSub/Gazebo base, CUDA perception stack  |
 
 Tip: start from the nearest environment and tune `rosdep-apt.list`, `rosdep-pip.list`, and `CONFIG_IMAGE_KEY` for your project.
 
@@ -47,14 +48,21 @@ Tip: start from the nearest environment and tune `rosdep-apt.list`, `rosdep-pip.
 
 We tested this repository on these configurations:
 
-| Scenario                       | Sample hardware                                          | Sample OS / platform             | Environments                    |
-| ------------------------------ | -------------------------------------------------------- | -------------------------------- | ------------------------------- |
-| Jetson development (`aarch64`) | Jetson Orin NX or AGX Orin, 40 GB+ free disk             | JetPack 6.x (Ubuntu 22.04 based) | `asv`, `auv`, `miniauv`, `uav2` |
-| Workstation (`x86_64`)         | 8+ CPU cores, 16-32 GB RAM, NVIDIA GPU, 50 GB+ free disk | Ubuntu 22.04 LTS                 | `auv_sim`, `uav2_sim`           |
+| Scenario                       | Sample hardware                                          | Sample OS / platform           | Environments          |
+| ------------------------------ | -------------------------------------------------------- | ------------------------------ | --------------------- |
+| Jetson development (`aarch64`) | Jetson Orin NX, AGX Orin or AGX Thor, 40 GB+ free disk   | JetPack 7 (Ubuntu 24.04 based) | `asv`, `auv`, `uav2`  |
+| Workstation (`x86_64`)         | 8+ CPU cores, 16-32 GB RAM, NVIDIA GPU, 50 GB+ free disk | Ubuntu 24.04 LTS               | `auv_sim`, `uav2_sim` |
+
+We tested on NVIDIA's Isaac ROS 4.6 images from the [NGC tag catalog](https://catalog.ngc.nvidia.com/orgs/nvidia/isaac/containers/ros/-/tags):
+
+- `nvcr.io/nvidia/isaac/ros:isaac_ros_de03e5dcb6796908b25f26e17c263ea5-amd64`
+- `nvcr.io/nvidia/isaac/ros:isaac_ros_de03e5dcb6796908b25f26e17c263ea5-arm64-jetpack`
+
+These are the latest versions as of 14 Aug 2026. Feel free to update accordingly.
 
 ## Installation
 
-_For ease of installation, save this directory as `~/workspaces/isaac-ros-docker`._
+_For ease of installation, save this directory as `~/workspaces/ros2-docker`._
 
 ### Installation on Jetson
 
@@ -62,7 +70,7 @@ _For ease of installation, save this directory as `~/workspaces/isaac-ros-docker
 <summary><strong>Installation on Jetson</strong></summary>
 </br>
 
-Source: [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html)
+Source: [https://nvidia-isaac-ros.github.io/getting_started/compute/index.html](https://nvidia-isaac-ros.github.io/getting_started/compute/index.html)
 
 Commands from the above website are pasted below:
 
@@ -101,33 +109,14 @@ newgrp docker
 
 Reboot the computer for the changes to take effect.
 
-#### Jetson Setup for VPI <!-- omit from toc -->
-
-Source: [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/jetson_vpi.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/jetson_vpi.html)
-
-```bash
-sudo nvidia-ctk cdi generate --mode=csv --output=/etc/cdi/nvidia.yaml
-
-# Add Jetson public APT repository
-sudo apt-get update
-sudo apt-get install software-properties-common
-sudo apt-key adv --fetch-key https://repo.download.nvidia.com/jetson/jetson-ota-public.asc
-sudo add-apt-repository 'deb https://repo.download.nvidia.com/jetson/common r36.4 main'
-sudo apt-get update
-sudo apt-get install -y pva-allow-2
-```
-
 #### Setup Isaac ROS <!-- omit from toc -->
 
-Source: [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html)
+Source: [https://nvidia-isaac-ros.github.io/getting_started/index.html](https://nvidia-isaac-ros.github.io/getting_started/index.html)
 
 Commands from the above website are pasted below:
 
 ```bash
 sudo systemctl daemon-reload && sudo systemctl restart docker
-
-sudo apt-get install git-lfs
-git lfs install --skip-repo
 
 mkdir -p ~/workspaces/isaac_ros-dev/src
 echo "export ISAAC_ROS_WS=${HOME}/workspaces/isaac_ros-dev/" >> ~/.bashrc
@@ -175,8 +164,8 @@ To avoid keying in the password each time login in via SSH, add the client compu
 <summary><strong>Installation on x86_64</strong></summary>
 </br>
 
-Follow [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/hardware_setup/compute/index.html)
-and [https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html](https://nvidia-isaac-ros.github.io/v/release-3.2/getting_started/dev_env_setup.html) to set up
+Follow [https://nvidia-isaac-ros.github.io/getting_started/compute/index.html](https://nvidia-isaac-ros.github.io/getting_started/compute/index.html)
+and [https://nvidia-isaac-ros.github.io/concepts/dev_env/index.html](https://nvidia-isaac-ros.github.io/concepts/dev_env/index.html) to set up
 Isaac ROS docker dev environment.
 
 Alternatively, use `scripts/install_dev_env_x86.sh`, and then run
@@ -189,43 +178,39 @@ outside of the script.
 
 </details>
 
-## Build Isaac ROS Docker Image
+## Build a ROS 2 Docker Image
 
-1. Clone `isaac_ros_common`.
+1. Choose or create an environment in the `environments` folder.
+
+2. Install the `ros2-docker` executable.
 
 ```bash
-cd ${ISAAC_ROS_WS}/src && \
-   git clone -b release-3.2 https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git isaac_ros_common
+./setup.sh
 ```
 
-`release-3.2` is the latest stable release as of 10 Jun 2025. Feel free to replace it with the latest stable release otherwise.
-
-2. Choose or create an environment in the `environments` folder.
-
-3. Create copies and symbolic links for the required config files and scripts by running the `setup_env_paths.sh` script in this repository.
+3. Select an environment. For example, for the `auv4_orin` environment:
 
 ```bash
-./scripts/setup_env_paths.sh <environment_name>
-```
-
-For example, for the `auv4_orin` environment:
-
-```bash
-./scripts/setup_env_paths.sh auv4_orin
+ros2-docker use auv4_orin
 ```
 
 4. Build the docker images.
 
 ```bash
-cd ${ISAAC_ROS_WS}/src/isaac_ros_common
-./scripts/run_dev.sh
+ros2-docker build
+```
+
+5. Start the container and open a shell.
+
+```bash
+ros2-docker start
 ```
 
 ## Production
 
 By default, file changes (except in the mounted workspaces) and installations in a running Docker container are not persistent. To save the current state of the container's filesystem to an image, do `docker container commit` (https://docs.docker.com/reference/cli/docker/container/commit/).
 
-Then, you can set the `BUILD_IMAGE_FLAG=0` in `.isaac_ros_common-config` (in the environment directory) and set `BUILT_IMAGE` to the image tag. This runs the built image instead of building a new image each time when starting the container.
+Then, you can set the `BUILD_IMAGE_FLAG=0` in `.ros_docker-config` (in the environment directory) and set `BUILT_IMAGE` to the image tag. This runs the built image instead of building a new image each time when starting the container.
 
 **NOTE**: `BUILD_IMAGE_FLAG=1` does not behave well when launching multiple instances of the container at the same time (e.g., using `tmuxp`). Recommended workflow is to build the container separately, set `BUILD_IMAGE_FLAG=0` and then launch the `tmuxp` session(s).
 

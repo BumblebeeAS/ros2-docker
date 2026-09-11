@@ -1,0 +1,28 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+ARG HOST_USER_UID=1000
+ARG HOST_USER_GID=${HOST_USER_UID}
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    sudo \
+    && existing_user="$(getent passwd "${HOST_USER_UID}" | cut -d: -f1 || true)" \
+    && if [ -n "${existing_user}" ]; then userdel "${existing_user}"; fi \
+    && existing_group="$(getent group "${HOST_USER_GID}" | cut -d: -f1 || true)" \
+    && if [ -n "${existing_group}" ]; then groupmod --new-name admin "${existing_group}"; else groupadd --gid "${HOST_USER_GID}" admin; fi \
+    && useradd --uid "${HOST_USER_UID}" --gid "${HOST_USER_GID}" --create-home --shell /bin/bash admin \
+    && usermod --append --groups sudo,video admin \
+    && echo "admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/admin \
+    && chmod 0440 /etc/sudoers.d/admin \
+    && mkdir -p /home/admin/.config \
+    && echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/admin/.bashrc \
+    && chown -R "${HOST_USER_UID}:${HOST_USER_GID}" /home/admin
+
+ENV HOME=/home/admin
+ENV USER=admin
+ENV LOGNAME=admin
+
+USER admin
+WORKDIR /home/admin

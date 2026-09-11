@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
 # Add Docker's official GPG key:
 sudo apt-get update
 sudo apt-get install ca-certificates curl
@@ -6,9 +10,12 @@ sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyring
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
 # Add the repository to Apt sources:
+# shellcheck disable=SC1091
+source /etc/os-release
+DOCKER_UBUNTU_CODENAME="${UBUNTU_CODENAME:-$VERSION_CODENAME}"
 echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" |
+  ${DOCKER_UBUNTU_CODENAME} stable" |
         sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
 sudo apt-get update
 
@@ -34,12 +41,7 @@ curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dear
 
 sudo apt-get update
 
-export NVIDIA_CONTAINER_TOOLKIT_VERSION=1.17.8-1
-sudo apt-get install -y \
-        nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-        nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-        libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-        libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}
+sudo apt-get install -y nvidia-container-toolkit
 
 # Configure nvidia-container-toolkit for Docker
 sudo nvidia-ctk runtime configure --runtime=docker
@@ -48,13 +50,11 @@ sudo systemctl restart docker
 # Restart Docker
 sudo systemctl daemon-reload && sudo systemctl restart docker
 
-# Install Git LFS
-sudo apt-get install git-lfs
-git lfs install --skip-repo
-
 # Create workspace
 TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 TARGET_BASHRC="$TARGET_HOME/.bashrc"
+# Keep $HOME literal so each interactive shell resolves its own home directory.
+# shellcheck disable=SC2016
 EXPORT_LINE='export ISAAC_ROS_WS=$HOME/workspaces/isaac_ros-dev/'
 
 mkdir -p "$TARGET_HOME/workspaces/isaac_ros-dev/src"

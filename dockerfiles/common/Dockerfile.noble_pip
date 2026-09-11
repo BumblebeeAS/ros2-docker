@@ -1,0 +1,15 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Ubuntu Noble marks the system Python environment as externally managed.
+# A system-site-packages venv keeps NVIDIA/ROS packages visible while giving
+# project layers a supported location for pip-installed dependencies.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    python3-pip \
+    python3-venv \
+    && python3 -m venv --system-site-packages /opt/venv
+
+ENV PATH="/opt/venv/bin:${PATH}"
