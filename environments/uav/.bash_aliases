@@ -7,6 +7,5 @@ alias udp4-dds-config="export FASTRTPS_DEFAULT_PROFILES_FILE=/workspaces/isaac_r
 alias clean-ws="rm -r build install log"
 alias start-mpserver="ros2 launch behavior_tree mission_planner.launch.py config:=example.yaml action_name:=my_engine groot2_port:=1667 ns:=aaa"
 alias source-cam-ws="source /workspaces/isaac_ros-dev/install/setup.bash"
-alias muxinator="tmuxinator start -p /workspaces/isaac_ros-dev/src/bring-up/etc/uav/config/tmuxinator/drone.yaml"
 alias run-tree="sh /workspaces/drone/tree_selection.sh"
 alias bag-cam="ros2 bag record -s mcap /uav/wide_a/rect/image /uav/narrow_a/rect/image"
