@@ -9,4 +9,4 @@ alias start-mpserver="ros2 launch behavior_tree mission_planner.launch.py config
 alias source-cam-ws="source /workspaces/isaac_ros-dev/install/setup.bash"
 alias muxinator="tmuxinator start -p /workspaces/isaac_ros-dev/src/bring-up/etc/uav/config/tmuxinator/drone.yaml"
 alias run-tree="sh /workspaces/drone/tree_selection.sh"
-alias bag-cam="ros2 bag record -s mcap /uav2/wide_a/rect/image /uav2/narrow_a/rect/image"
+alias bag-cam="ros2 bag record -s mcap /uav/wide_a/rect/image /uav/narrow_a/rect/image"
