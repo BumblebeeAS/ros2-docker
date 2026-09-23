@@ -38,8 +38,8 @@ We deploy on three types of vehicles:
 | `asv`       | ASV software stack on Jetson                                                            | Spinnaker support for cameras, `eigen-quadprog`, `pcl`, `rtcm`, `nmea` |
 | `auv`       | AUV software stack on Jetson                                                            |                                                                        |
 | `auv_sim`   | AUV simulation with [DAVE Sim](https://field-robotics-lab.github.io/dave.doc/) + Gazebo |                                                                        |
-| `uav2`      | UAV software stack on Jetson                                                            | PX4 DDS bridge support via Micro XRCE-DDS Agent, Argus camera support  |
-| `uav2_sim`  | UAV simulation with PX4 + Gazebo                                                        | PX4 Autopilot SITL + Gazebo, MAVSDK tooling                            |
+| `uav`      | UAV software stack on Jetson                                                            | PX4 DDS bridge support via Micro XRCE-DDS Agent, Argus camera support  |
+| `uav_sim`  | UAV simulation with PX4 + Gazebo                                                        | PX4 Autopilot SITL + Gazebo, MAVSDK tooling                            |
 | `bluerov_ws` | BlueROV simulation demos from [BumblebeeAS/examples](https://github.com/BumblebeeAS/examples) | Standard ROS Jazzy image, ArduSub/Gazebo base, CUDA perception stack  |
 
 Tip: start from the nearest environment and tune `rosdep-apt.list`, `rosdep-pip.list`, and `CONFIG_IMAGE_KEY` for your project.
@@ -50,8 +50,8 @@ We tested this repository on these configurations:
 
 | Scenario                       | Sample hardware                                          | Sample OS / platform           | Environments          |
 | ------------------------------ | -------------------------------------------------------- | ------------------------------ | --------------------- |
-| Jetson development (`aarch64`) | Jetson Orin NX, AGX Orin or AGX Thor, 40 GB+ free disk   | JetPack 7 (Ubuntu 24.04 based) | `asv`, `auv`, `uav2`  |
-| Workstation (`x86_64`)         | 8+ CPU cores, 16-32 GB RAM, NVIDIA GPU, 50 GB+ free disk | Ubuntu 24.04 LTS               | `auv_sim`, `uav2_sim` |
+| Jetson development (`aarch64`) | Jetson Orin NX, AGX Orin or AGX Thor, 40 GB+ free disk   | JetPack 7 (Ubuntu 24.04 based) | `asv`, `auv`, `uav`  |
+| Workstation (`x86_64`)         | 8+ CPU cores, 16-32 GB RAM, NVIDIA GPU, 50 GB+ free disk | Ubuntu 24.04 LTS               | `auv_sim`, `uav_sim` |
 
 We tested on NVIDIA's Isaac ROS 4.6 images from the [NGC tag catalog](https://catalog.ngc.nvidia.com/orgs/nvidia/isaac/containers/ros/-/tags):
 
