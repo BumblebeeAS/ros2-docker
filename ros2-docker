@@ -201,6 +201,13 @@ up() {
         -v /run/udev:/run/udev:ro
         --group-add video
     )
+    if [[ "${REQUIRE_ARGUS:-0}" == "1" ]]; then
+        if [[ ! -S /tmp/argus_socket ]]; then
+            printf '%s\n' 'Argus socket missing. Start nvargus-daemon on the host before starting this container.' >&2
+            return 1
+        fi
+        DOCKER_ARGS+=( --mount type=bind,src=/tmp/argus_socket,dst=/tmp/argus_socket )
+    fi
     DOCKER_ARGS+=( "${ISAAC_ROS_DOCKER_ARGS[@]}" )
 
     [[ -f "$HOME/.Xauthority" ]] && DOCKER_ARGS+=( -v "$HOME/.Xauthority:/home/admin/.Xauthority:rw" )
