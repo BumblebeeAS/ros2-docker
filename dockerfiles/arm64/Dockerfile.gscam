@@ -1,0 +1,12 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+# CSI capture uses the host JetPack Argus daemon, without the retired ROS driver.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y \
+    kmod libegl1 libgles2 \
+    gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+    ros-${ROS_DISTRO}-gscam \
+    ros-${ROS_DISTRO}-isaac-ros-image-proc \
+    ros-${ROS_DISTRO}-compressed-image-transport

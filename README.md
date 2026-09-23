@@ -44,6 +44,8 @@ We deploy on three types of vehicles:
 
 Tip: start from the nearest environment and tune `rosdep-apt.list`, `rosdep-pip.list`, and `CONFIG_IMAGE_KEY` for your project.
 
+The `uav` environment uses GSCam with Isaac ROS 5.0 / ROS 2 Lyrical for the two IMX219 cameras. Each camera and its processing nodes run in a separate component container.
+
 ## Sample Hardware and OS Requirements
 
 We tested this repository on these configurations:
@@ -59,6 +61,8 @@ We tested on NVIDIA's Isaac ROS 4.6 images from the [NGC tag catalog](https://ca
 - `nvcr.io/nvidia/isaac/ros:isaac_ros_de03e5dcb6796908b25f26e17c263ea5-arm64-jetpack`
 
 These are the latest versions as of 14 Aug 2026. Feel free to update accordingly.
+
+Start `nvargus-daemon` on the host before `ros2-docker up`; `REQUIRE_ARGUS=1` checks and mounts its socket for GStreamer. After restarting the daemon, recreate the container with `ros2-docker down` and `ros2-docker up` to refresh the socket mount.
 
 ## Installation
 
