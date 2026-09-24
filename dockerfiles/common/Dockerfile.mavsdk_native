@@ -1,0 +1,10 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y patchelf libstdc++6
+
+# MAVSDK 4.0.0's aarch64 wheel omits its libstdc++ dependency.
+RUN python3 -c 'from importlib.metadata import distribution; import subprocess; p = distribution("mavsdk").locate_file("mavsdk/lib/libcmavsdk.so"); subprocess.run(["patchelf", "--add-needed", "libstdc++.so.6", str(p)], check=True)' \
+    && python3 -c 'from mavsdk.asyncio import Mavsdk, Configuration, ComponentType; m = Mavsdk(Configuration.create_with_component_type(ComponentType.COMPANION_COMPUTER)); m.destroy()'

@@ -1,9 +1,12 @@
+git-lfs
 python3-pytest
 python3-opencv
 python3-shapely
 ros-lyrical-ament-clang-format
 ros-lyrical-foxglove-msgs
 ros-lyrical-example-interfaces
+ros-lyrical-nav2-msgs
+ros-lyrical-xacro
 ros-lyrical-imu-complementary-filter
 ros-lyrical-image-proc
 ros-lyrical-tracetools-image-pipeline

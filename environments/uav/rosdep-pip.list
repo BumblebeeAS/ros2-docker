@@ -5,4 +5,5 @@ opencv-contrib-python<4.12
 pygeodesy
 supervision
 typer
-mavsdk
+mavsdk==4.0.0
+scikit-learn>=1.3
