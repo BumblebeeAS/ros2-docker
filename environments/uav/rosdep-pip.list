@@ -6,3 +6,4 @@ pygeodesy
 supervision
 typer
 mavsdk
+scikit-learn>=1.3
