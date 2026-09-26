@@ -3,16 +3,16 @@ ARG BASE_IMAGE=ubuntu:22.04
 FROM $BASE_IMAGE
 
 ARG PX4_VERSION=v1.16.0
+ARG ROS_DISTRO=jazzy
 
 # kconfiglib pip install fails in Dockerfile context; must use apt
-# ros-humble-ros-gzharmonic-bridge enables PX4 <-> Gazebo Harmonic transport
-# --> ADDED 'patch' TO THIS LIST <--
+# ros-gz-bridge enables ROS <-> Gazebo Harmonic transport
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y \
     curl \
     python3-kconfiglib \
-    ros-humble-ros-gzharmonic-bridge \
+    ros-${ROS_DISTRO}-ros-gz-bridge \
     patch
 
 # Clone, patch, and build PX4 SITL
@@ -74,10 +74,6 @@ index fed292b9d1..1d34854077 100644
 PATCH
 
 ./Tools/setup/ubuntu.sh --no-nuttx --no-sim-tools
-
-# The dave_sim layer installs an aarch64 protoc binary to /usr/local/bin/protoc.
-# Remove it so cmake uses the x86_64 protoc installed above by ubuntu.sh.
-rm -f /usr/local/bin/protoc
 
 make -j$(nproc) px4_sitl_default
 

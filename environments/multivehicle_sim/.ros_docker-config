@@ -1,0 +1,20 @@
+# Build parameters, used by ros2-docker build
+CONFIG_IMAGE_KEY=apt_cache.noble_pip.ultralytics_cuda.trt.ccache.eigen_quadprog.dave_sim.px4_sitl.micro_xrce_dds_agent.multivehicle_sim.install_env.ros2_python_pins
+CONFIG_DOCKER_SEARCH_DIRS=(
+    "dockerfiles/common"
+    "dockerfiles/amd64"
+    "dockerfiles/environments"
+)
+
+BUILT_IMAGE=isaac-ros-multivehicle-sim:latest
+
+# Mount all vehicle workspaces.
+MOUNT_DIRS=(
+    "$HOME/workspaces:/workspaces"
+    "$HOME/.cache/ccache:/home/admin/.cache/ccache"
+    "$HOME/.cache/torch:/home/admin/.cache/torch"
+    "$HOME/.cache/matplotlib:/home/admin/.cache/matplotlib"
+)
+WORKDIR=/workspaces/isaac_ros-dev
+DOCKER_CONTEXT_DIR=.
+DOCKER_BUILD_BASE_IMAGE=nvcr.io/nvidia/isaac/ros:isaac_ros_de03e5dcb6796908b25f26e17c263ea5-amd64

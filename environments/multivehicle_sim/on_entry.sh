@@ -6,9 +6,6 @@
 
 set -e
 
-# For protobuf permissions for dave sim plugins (inherited from auv_sim)
-sudo chown $(whoami) -R /usr/local/include/google/protobuf
-
 PX4_AUTOPILOT_DIR=$HOME/PX4-Autopilot
 PX4_SITL_DIR=$HOME/px4_sitl
 UAV_WS_DIR=/workspaces/uav_ws

@@ -1,23 +1,29 @@
 # multivehicle_sim environment
 
-Docker environment for running multi-vehicle Gazebo simulations with standalone PX4 SITL.
+ROS 2 Jazzy / amd64 Docker environment for running multi-vehicle Gazebo simulations with standalone PX4 SITL.
+
+```bash
+ros2-docker use multivehicle_sim
+ros2-docker build
+ros2-docker start
+```
 
 See [bring-up/etc/multivehicle_sim/README.md](https://github.com/BumblebeeAS/bring-up) for the full simulation quickstart and usage guide.
 
 ## Image Key
 
 ```
-ros2_humble.ultralytics_cuda.trt.ccache.eigen_quadprog.dave_sim.auv_sim.px4_sitl.micro_xrce_dds_agent.multivehicle_sim.install_env
+apt_cache.noble_pip.ultralytics_cuda.trt.ccache.eigen_quadprog.dave_sim.px4_sitl.micro_xrce_dds_agent.multivehicle_sim.install_env.ros2_python_pins
 ```
 
 Notable layers:
 
 | Layer | Purpose |
 |---|---|
+| `trt` | Installs TensorRT Python bindings (standard, lean, and dispatch), which are absent from the configured base image |
 | `px4_sitl` | Builds PX4 v1.16 SITL and extracts a minimal standalone runtime to `~/px4_sitl/` |
 | `micro_xrce_dds_agent` | Builds and installs Micro XRCE-DDS Agent v2.4.3 |
-| `dave_sim` | Dave underwater simulation plugins |
-| `auv_sim` | AUV simulation dependencies |
+| `dave_sim` | DAVE underwater simulation workspace, sourced from `/opt/dave_ws` |
 | `multivehicle_sim` | Environment-specific setup (`on_entry.sh`, `.bash_aliases`, `.bashrc`) + `bb_robotx_dashboard` pip deps (`fastapi`, `uvicorn[standard]`, `pydantic-settings`) installed in `Dockerfile.multivehicle_sim` |
 
 ## on_entry.sh
@@ -111,4 +117,4 @@ Other is from: https://github.com/PX4/PX4-Autopilot/issues/25859#issuecomment-39
 
 Things might changes over time. 
 
-Also there are some dependency management fixes we did with protobuf to make it compatible to dave and also the PX4 build. Take care.
+The `dave_sim` layer installs `protobuf-compiler` and `libprotobuf-dev` through apt. The later PX4 layer inherits these packages, but the compiler and libraries actually selected during the builds have not been verified. A full image build is still required to confirm protobuf compatibility.
