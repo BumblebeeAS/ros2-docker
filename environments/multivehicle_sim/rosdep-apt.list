@@ -25,7 +25,6 @@ ros-jazzy-isaac-ros-tensor-list-interfaces
 ros-jazzy-isaac-ros-nitros-tensor-list-type
 ros-jazzy-isaac-ros-common
 ros-jazzy-isaac-ros-nitros-image-type
-ros-jazzy-isaac-ros-nitros-camera-info-type
 ros-jazzy-marine-acoustic-msgs
 ros-jazzy-pcl-ros
 ros-jazzy-spatio-temporal-voxel-layer
