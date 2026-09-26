@@ -38,21 +38,23 @@ We deploy on three types of vehicles:
 | `asv`       | ASV software stack on Jetson                                                            | Spinnaker support for cameras, `eigen-quadprog`, `pcl`, `rtcm`, `nmea` |
 | `auv`       | AUV software stack on Jetson                                                            |                                                                        |
 | `auv_sim`   | AUV simulation with [DAVE Sim](https://field-robotics-lab.github.io/dave.doc/) + Gazebo |                                                                        |
-| `uav2`      | UAV software stack on Jetson                                                            | PX4 DDS bridge support via Micro XRCE-DDS Agent, Argus camera support  |
-| `uav2_sim`  | UAV simulation with PX4 + Gazebo                                                        | PX4 Autopilot SITL + Gazebo, MAVSDK tooling                            |
+| `uav`      | UAV software stack on Jetson                                                            | PX4 DDS bridge support via Micro XRCE-DDS Agent, Argus camera support  |
+| `uav_sim`  | UAV simulation with PX4 + Gazebo                                                        | PX4 Autopilot SITL + Gazebo, MAVSDK tooling                            |
 | `multivehicle_sim` | Multi-vehicle simulation with DAVE + Gazebo | Standalone PX4 SITL, Micro XRCE-DDS Agent, all vehicle workspaces mounted |
 | `bluerov_ws` | BlueROV simulation demos from [BumblebeeAS/examples](https://github.com/BumblebeeAS/examples) | Standard ROS Jazzy image, ArduSub/Gazebo base, CUDA perception stack  |
 
 Tip: start from the nearest environment and tune `rosdep-apt.list`, `rosdep-pip.list`, and `CONFIG_IMAGE_KEY` for your project.
 
+The `uav` environment uses GSCam with Isaac ROS 5.0 / ROS 2 Lyrical for the two IMX219 cameras. Each camera and its processing nodes run in a separate component container.
+
 ## Sample Hardware and OS Requirements
 
 We tested this repository on these configurations:
 
-| Scenario                       | Sample hardware                                          | Sample OS / platform           | Environments          |
-| ------------------------------ | -------------------------------------------------------- | ------------------------------ | --------------------- |
-| Jetson development (`aarch64`) | Jetson Orin NX, AGX Orin or AGX Thor, 40 GB+ free disk   | JetPack 7 (Ubuntu 24.04 based) | `asv`, `auv`, `uav2`  |
-| Workstation (`x86_64`)         | 8+ CPU cores, 16-32 GB RAM, NVIDIA GPU, 50 GB+ free disk | Ubuntu 24.04 LTS               | `auv_sim`, `uav2_sim` |
+| Scenario                       | Sample hardware                                          | Sample OS / platform           | Environments         |
+| ------------------------------ | -------------------------------------------------------- | ------------------------------ | -------------------- |
+| Jetson development (`aarch64`) | Jetson Orin NX, AGX Orin or AGX Thor, 40 GB+ free disk   | JetPack 7 (Ubuntu 24.04 based) | `asv`, `auv`, `uav`  |
+| Workstation (`x86_64`)         | 8+ CPU cores, 16-32 GB RAM, NVIDIA GPU, 50 GB+ free disk | Ubuntu 24.04 LTS               | `auv_sim`, `uav_sim` |
 
 We tested on NVIDIA's Isaac ROS 4.6 images from the [NGC tag catalog](https://catalog.ngc.nvidia.com/orgs/nvidia/isaac/containers/ros/-/tags):
 
@@ -60,6 +62,8 @@ We tested on NVIDIA's Isaac ROS 4.6 images from the [NGC tag catalog](https://ca
 - `nvcr.io/nvidia/isaac/ros:isaac_ros_de03e5dcb6796908b25f26e17c263ea5-arm64-jetpack`
 
 These are the latest versions as of 14 Aug 2026. Feel free to update accordingly.
+
+Start `nvargus-daemon` on the host before `ros2-docker up`; `REQUIRE_ARGUS=1` checks and mounts its socket for GStreamer. After restarting the daemon, recreate the container with `ros2-docker down` and `ros2-docker up` to refresh the socket mount.
 
 ## Installation
 

@@ -6,7 +6,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   apt-get update && apt-get install -y --no-install-recommends \
   git cmake build-essential pkg-config libeigen3-dev gfortran libboost-test-dev
 
-RUN git clone --recursive https://github.com/jrl-umi3218/eigen-quadprog /tmp/eigen-quadprog && \
+RUN git clone --depth 1 --shallow-submodules --recursive \
+  https://github.com/jrl-umi3218/eigen-quadprog /tmp/eigen-quadprog && \
   cd /tmp/eigen-quadprog && \
   mkdir -p _build && \
   cd _build && \
