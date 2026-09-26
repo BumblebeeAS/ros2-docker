@@ -1,7 +1,0 @@
-ARG BASE_IMAGE
-FROM $BASE_IMAGE
-
-# "numpy<2" required for cv_bridge
-RUN python3 -m pip install -U \
-  "numpy<2" \
-  opencv-contrib-python

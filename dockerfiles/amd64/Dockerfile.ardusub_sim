@@ -1,0 +1,80 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+SHELL ["/bin/bash", "-o", "pipefail", "-o", "errexit", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive
+ARG ROS_DISTRO=jazzy
+
+ENV TZ=Etc/UTC
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
+    && echo "$TZ" > /etc/timezone \
+    && ln -fs "/usr/share/zoneinfo/$TZ" /etc/localtime
+
+# Gazebo Harmonic is distributed through the OSRF apt repository.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        gnupg \
+        lsb-release \
+    && curl https://packages.osrfoundation.org/gazebo.gpg \
+        --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
+    && source /etc/os-release \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] https://packages.osrfoundation.org/gazebo/ubuntu-stable ${VERSION_CODENAME} main" \
+        > /etc/apt/sources.list.d/gazebo-stable.list
+
+# Dependencies ported from BumblebeeAS/ardusub_sim, upgraded from ROS 2 Humble
+# on Jammy to ROS 2 Jazzy on Noble.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        git \
+        gz-harmonic \
+        libgl1 \
+        libgstreamer1.0-dev \
+        libgstreamer-plugins-base1.0-dev \
+        libgz-sim8-dev \
+        libopencv-dev \
+        libyaml-cpp-dev \
+        pkg-config \
+        python3-colcon-common-extensions \
+        python3-empy \
+        python3-setuptools \
+        rapidjson-dev \
+        ros-${ROS_DISTRO}-mavros \
+        ros-${ROS_DISTRO}-mavros-extras \
+        ros-${ROS_DISTRO}-ros-gz \
+        ros-${ROS_DISTRO}-sdformat-urdf \
+        ros-${ROS_DISTRO}-tf-transformations \
+        wget \
+    && apt-get autoremove -y \
+    && apt-get clean
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends locales \
+    && locale-gen en_US en_US.UTF-8 \
+    && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+
+# GeographicLib datasets are required by MAVROS.
+# Source: https://docs.ros.org/en/jazzy/p/mavros/#binary-installation-deb
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update \
+    && apt-get install -y --no-install-recommends geographiclib-tools \
+    && source "/opt/ros/${ROS_DISTRO}/setup.bash" \
+    && ros2 run mavros install_geographiclib_datasets.sh \
+    && apt-get clean
+
+# The published SITL executable is x86-64, so this layer belongs in amd64.
+ARG ARDUSUB_FIRMWARE_URL=https://firmware.ardupilot.org/Sub/stable/sitl/ardusub
+RUN mkdir -p /opt/ardupilot/bin \
+    && wget -q -O /opt/ardupilot/bin/ardusub "${ARDUSUB_FIRMWARE_URL}" \
+    && chmod +x /opt/ardupilot/bin/ardusub
+
+ENV GZ_VERSION=harmonic
+ENV PATH="/opt/ardupilot/bin:/root/.local/bin:${PATH}"

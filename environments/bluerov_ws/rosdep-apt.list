@@ -1,0 +1,8 @@
+libgl1-mesa-dri
+mesa-utils
+ros-jazzy-example-interfaces
+ros-jazzy-foxglove-msgs
+ros-jazzy-joint-state-publisher
+ros-jazzy-py-trees
+ros-jazzy-py-trees-ros
+software-properties-common
