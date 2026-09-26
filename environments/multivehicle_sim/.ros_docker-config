@@ -1,5 +1,5 @@
 # Build parameters, used by ros2-docker build
-CONFIG_IMAGE_KEY=apt_cache.noble_pip.ultralytics_cuda.trt.ccache.eigen_quadprog.dave_sim.px4_sitl.micro_xrce_dds_agent.multivehicle_sim.install_env.ros2_python_pins
+CONFIG_IMAGE_KEY=apt_cache.noble_pip.ultralytics_cuda.trt.ccache.eigen_quadprog.px4_sitl.micro_xrce_dds_agent.multivehicle_sim.install_env.ros2_python_pins
 CONFIG_DOCKER_SEARCH_DIRS=(
     "dockerfiles/common"
     "dockerfiles/amd64"
