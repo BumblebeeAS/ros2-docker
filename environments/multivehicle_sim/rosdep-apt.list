@@ -31,3 +31,7 @@ ros-jazzy-spatio-temporal-voxel-layer
 ros-jazzy-diagnostic-updater
 ros-jazzy-nav2-msgs
 ros-jazzy-point-cloud-transport
+ros-jazzy-ros-gz-sim
+ros-jazzy-gz-plugin-vendor
+ros-jazzy-xacro
+libcudnn9-dev-cuda-13
