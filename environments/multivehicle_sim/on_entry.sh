@@ -26,7 +26,7 @@ cp --remove-destination "${ETC_DIR}/5000_gz_uav" "${PX4_AIRFRAMES_DIR}/5000_gz_u
 # `|| true` so a missing network / unzip doesn't halt the entrypoint. The
 # dashboard's runtime env vars (ROBOCOMMAND_*, DASHBOARD_*) live in
 # environments/multivehicle_sim/.bashrc so every tmux pane sees them.
-DASHBOARD_PKG_DIR=/workspaces/common_ws/src/bb_robotx_dashboard
+DASHBOARD_PKG_DIR=/workspaces/isaac_ros-dev/src/bb_robotx_dashboard
 if [ -d "${DASHBOARD_PKG_DIR}" ]; then
     if [ ! -d "${DASHBOARD_PKG_DIR}/third_party/robocommand/proto" ]; then
         git clone https://github.com/MonkeScripts/robocommand \

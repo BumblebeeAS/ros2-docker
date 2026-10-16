@@ -38,7 +38,7 @@ The `px4-sitl` alias uses the bring-up multivehicle launcher, which selects the 
 
 **Must be re-run after rebuilding `uav2_description`** (since the URDF → SDF conversion is done at runtime, not at image build time).
 
-If `/workspaces/common_ws/src/bb_robotx_dashboard` is checked out, the script
+If `/workspaces/isaac_ros-dev/src/bb_robotx_dashboard` is checked out, the script
 also bootstraps the dashboard's protobuf bindings (idempotent, each step
 wrapped in `|| true`):
 
@@ -85,8 +85,7 @@ Expected workspace layout on the host:
 
 ```
 ~/workspaces/
-├── isaac_ros-dev/    # bring-up configs and repos files
-├── common_ws/        # shared: dave, simulator, bb_worlds, bb_msgs, frames, vision, etc.
+├── isaac_ros-dev/    # bring-up and shared simulation/ROS packages
 ├── uav_ws/           # UAV-specific packages
 ├── auv_ws/           # AUV-specific packages
 └── asv_ws/           # ASV-specific packages
