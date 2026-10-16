@@ -31,8 +31,10 @@ Notable layers:
 Runs at container startup as the `admin` user. Sets up the PX4 Gazebo model and airframe for `uav2_description`:
 
 1. Converts `uav2.urdf` → `model.sdf` via `gz sdf -p`
-2. Places the SDF and `model.config` in `~/PX4-Autopilot/Tools/simulation/gz/models/uav2/`
-3. Symlinks `5000_gz_uav2` into `~/px4_sitl/romfs/etc/init.d-posix/airframes/`
+2. Places the SDF and copies `bring-up/etc/uav_sim/model.config` into `~/PX4-Autopilot/Tools/simulation/gz/models/uav2/`
+3. Copies `bring-up/etc/uav_sim/5000_gz_uav` into `~/px4_sitl/romfs/etc/init.d-posix/airframes/5000_gz_uav2`
+
+The `px4-sitl` alias uses the bring-up multivehicle launcher, which selects the `uav2` model and overrides the shared airframe world default. Update bring-up alongside this environment. Existing asset symlinks are replaced with regular files at startup.
 
 **Must be re-run after rebuilding `uav2_description`** (since the URDF → SDF conversion is done at runtime, not at image build time).
 
