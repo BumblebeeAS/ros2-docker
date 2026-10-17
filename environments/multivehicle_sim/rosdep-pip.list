@@ -7,4 +7,5 @@ supervision
 typer
 transforms3d
 python-telegram-bot
-mavsdk
+mavsdk<4
+pygeodesy
