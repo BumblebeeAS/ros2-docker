@@ -9,8 +9,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
         'uvicorn[standard]' \
         'pydantic-settings'
 
-RUN apt-get purge -y npm \
-      && apt-get autoremove -y \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get purge -y npm \
       && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-      && apt-get install -y nodejs \
-      && rm -rf /var/lib/apt/lists/*
+      && apt-get install -y nodejs
