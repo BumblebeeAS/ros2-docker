@@ -8,6 +8,9 @@ CONFIG_DOCKER_SEARCH_DIRS=(
 
 BUILT_IMAGE=isaac-ros-uav:latest
 
+# Must match the flight controller uXRCE-DDS domain (UXRCE_DDS_DOM_ID).
+CONFIG_ROS_DOMAIN_ID=38
+
 # Note that env variables like $HOME cannot be unpacked here
 MOUNT_DIRS=(
     "$HOME/workspaces/isaac_ros-dev:/workspaces/isaac_ros-dev"

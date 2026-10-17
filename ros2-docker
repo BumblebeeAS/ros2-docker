@@ -150,7 +150,7 @@ exec_in_container() {
     if [[ $# -gt 0 ]]; then
         printf "${INFO}Executing in %s: %s${NC}\n" "$CONTAINER_NAME" "$*"
         docker exec -it -u admin \
-            --workdir "$WORKDIR" "$CONTAINER_NAME" bash -lc "$*"
+            --workdir "$WORKDIR" "$CONTAINER_NAME" bash -ic "$*"
     else
         printf "${INFO}Attaching to: %s${NC}\n" "$CONTAINER_NAME"
         docker exec -it -u admin \
@@ -192,7 +192,7 @@ up() {
         -e "DISPLAY=${DISPLAY:-}"
         -e NVIDIA_VISIBLE_DEVICES=all
         -e NVIDIA_DRIVER_CAPABILITIES=all
-        -e "ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}"
+        -e "ROS_DOMAIN_ID=${CONFIG_ROS_DOMAIN_ID:-${ROS_DOMAIN_ID:-0}}"
         -e "HOST_USER_UID=$(id -u)"
         -e "HOST_USER_GID=$(id -g)"
         -v /tmp/.X11-unix:/tmp/.X11-unix
