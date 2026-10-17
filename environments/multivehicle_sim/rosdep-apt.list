@@ -35,3 +35,9 @@ ros-jazzy-ros-gz-sim
 ros-jazzy-gz-plugin-vendor
 ros-jazzy-xacro
 libcudnn9-dev-cuda-13
+python3-shapely
+ros-jazzy-generate-parameter-library
+ros-jazzy-joint-state-publisher
+ros-jazzy-joint-state-publisher-gui
+ros-jazzy-ruckig
+ros-jazzy-sdformat-urdf
