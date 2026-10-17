@@ -13,7 +13,7 @@ See [bring-up/etc/multivehicle_sim/README.md](https://github.com/BumblebeeAS/bri
 ## Image Key
 
 ```
-apt_cache.noble_pip.ultralytics_cuda.trt.ccache.eigen_quadprog.px4_sitl.micro_xrce_dds_agent.multivehicle_sim.install_env.ros2_python_pins
+apt_cache.noble_pip.ultralytics_cuda.trt.ccache.eigen_quadprog.px4_sitl.micro_xrce_dds_agent.multivehicle_sim.install_env.dave_sim.ros2_python_pins
 ```
 
 Notable layers:
@@ -23,6 +23,7 @@ Notable layers:
 | `trt` | Installs TensorRT Python bindings (standard, lean, and dispatch), which are absent from the configured base image |
 | `px4_sitl` | Builds PX4 v1.16 SITL and extracts a minimal standalone runtime to `~/px4_sitl/` |
 | `micro_xrce_dds_agent` | Builds and installs Micro XRCE-DDS Agent v2.4.3 |
+| `dave_sim` | Builds pinned DAVE revision `0e28353` in `/opt/dave_ws` |
 | `multivehicle_sim` | Environment-specific setup (`on_entry.sh`, `.bash_aliases`, `.bashrc`) + `bb_robotx_dashboard` pip deps (`fastapi`, `uvicorn[standard]`, `pydantic-settings`) installed in `Dockerfile.multivehicle_sim` |
 
 ## on_entry.sh
