@@ -1,5 +1,5 @@
 # Build parameters, used by ros2-docker build
-CONFIG_IMAGE_KEY=apt_cache.gscam.noble_pip.ultralytics_cuda.micro_xrce_dds_agent.ccache.uav.install_env.ros2_python_pins
+CONFIG_IMAGE_KEY=apt_cache.gscam.noble_pip.ultralytics_cuda.micro_xrce_dds_agent.ccache.uav.install_env.mavsdk_native.ros2_python_pins
 CONFIG_DOCKER_SEARCH_DIRS=(
     "dockerfiles/common"
     "dockerfiles/environments"
@@ -7,6 +7,9 @@ CONFIG_DOCKER_SEARCH_DIRS=(
 )
 
 BUILT_IMAGE=isaac-ros-uav:latest
+
+# Must match the flight controller uXRCE-DDS domain (UXRCE_DDS_DOM_ID).
+CONFIG_ROS_DOMAIN_ID=38
 
 # Note that env variables like $HOME cannot be unpacked here
 MOUNT_DIRS=(

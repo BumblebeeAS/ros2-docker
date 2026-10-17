@@ -1,0 +1,49 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+ARG MAVSDK_VERSION=4.0.0
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y build-essential cmake curl patchelf \
+    && python3 -m pip install setuptools-scm wheel
+
+# The aarch64 pip wheel's bundled C++ runtime crashes during system discovery.
+# Install Python and C bindings from one release, using its official native core.
+RUN <<'SHELL'
+set -eu
+mkdir /tmp/mavsdk
+cd /tmp/mavsdk
+curl -fL --retry 3 -o native.deb "https://github.com/mavlink/MAVSDK/releases/download/v${MAVSDK_VERSION}/libmavsdk-dev_${MAVSDK_VERSION}_debian12_$(dpkg --print-architecture).deb"
+curl -fL --retry 3 -o source.tar.gz "https://codeload.github.com/mavlink/MAVSDK/tar.gz/refs/tags/v${MAVSDK_VERSION}"
+dpkg-deb -x native.deb native
+mkdir source
+tar -xzf source.tar.gz -C source --strip-components=1
+cmake -S source/c -B build \
+    -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON \
+    -DBUNDLE_STATIC_RUNTIME=OFF -DBUILD_EXAMPLES=OFF \
+    -DCMAKE_PREFIX_PATH=/tmp/mavsdk/native/usr
+cmake --build build --parallel 4
+lib_dir=source/py/mavsdk/mavsdk/lib
+mkdir "$lib_dir"
+core_library=$(find native/usr/lib -maxdepth 1 -type f -name 'libmavsdk.so*' -print -quit)
+cp "$core_library" "$lib_dir/$(patchelf --print-soname "$core_library")"
+cp -L build/src/libcmavsdk.so "$lib_dir/libcmavsdk.so"
+patchelf --set-rpath '$ORIGIN' "$lib_dir/libcmavsdk.so"
+SETUPTOOLS_SCM_PRETEND_VERSION="${MAVSDK_VERSION}" \
+    python3 -m pip install --no-build-isolation --no-deps ./source/py/mavsdk
+cd /
+rm -rf /tmp/mavsdk
+SHELL
+
+# The container user is mapped to these host IDs by the NVIDIA entrypoint.
+ARG HOST_USER_UID
+ARG HOST_USER_GID
+RUN install -d -m 755 -o "${HOST_USER_UID}" -g "${HOST_USER_GID}" \
+    /home/${USERNAME}/.cache/mavsdk
+
+# Construction alone does not exercise the metadata code that crashed.
+COPY scripts/check_mavsdk_discovery.py /tmp/check_mavsdk_discovery.py
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh \
+    && python3 /tmp/check_mavsdk_discovery.py \
+    && rm /tmp/check_mavsdk_discovery.py
