@@ -16,8 +16,6 @@ ros-jazzy-py-trees
 ros-jazzy-py-trees-ros
 python3-pytest
 python3-ntplib
-ros-jazzy-isaac-ros-test
-ros-jazzy-isaac-ros-tensor-rt
 ros-jazzy-isaac-ros-dnn-image-encoder
 ros-jazzy-isaac-ros-nitros
 ros-jazzy-isaac-ros-managed-nitros
@@ -41,3 +39,7 @@ ros-jazzy-joint-state-publisher
 ros-jazzy-joint-state-publisher-gui
 ros-jazzy-ruckig
 ros-jazzy-sdformat-urdf
+ros-jazzy-nav2-planner
+ros-jazzy-nav2-lifecycle-manager
+ros-jazzy-nav2-smac-planner
+ros-jazzy-draco-point-cloud-transport

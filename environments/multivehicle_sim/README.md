@@ -28,23 +28,15 @@ Notable layers:
 
 ## on_entry.sh
 
-Runs at container startup as the `admin` user. Sets up the PX4 Gazebo model and airframe for `uav2_description`:
-
-1. Converts `uav2.urdf` → `model.sdf` via `gz sdf -p`
-2. Places the SDF and copies `bring-up/etc/uav_sim/model.config` into `~/PX4-Autopilot/Tools/simulation/gz/models/uav2/`
-3. Copies `bring-up/etc/uav_sim/5000_gz_uav` into `~/px4_sitl/romfs/etc/init.d-posix/airframes/5000_gz_uav2`
-
-The `px4-sitl` alias uses the bring-up multivehicle launcher, which selects the `uav2` model and overrides the shared airframe world default. Update bring-up alongside this environment. Existing asset symlinks are replaced with regular files at startup.
-
-**Must be re-run after rebuilding `uav2_description`** (since the URDF → SDF conversion is done at runtime, not at image build time).
+Rerun after rebuilding `uav_description`.
 
 If `/workspaces/isaac_ros-dev/src/bb_robotx_dashboard` is checked out, the script
-also bootstraps the dashboard's protobuf bindings (idempotent, each step
+bootstraps the dashboard's protobuf bindings (idempotent, each step
 wrapped in `|| true`):
 
-4. `git clone MonkeScripts/robocommand → third_party/robocommand` (upstream `.proto` sources)
-5. `scripts/fetch_protoc.sh` (downloads protoc 33 into `third_party/protoc/`; needs `unzip`)
-6. `scripts/compile_protos.sh` (writes `bb_robotx_dashboard/proto/*_pb2.py`)
+1. `git clone MonkeScripts/robocommand → third_party/robocommand` (upstream `.proto` sources)
+2. `scripts/fetch_protoc.sh` (downloads protoc 33 into `third_party/protoc/`; needs `unzip`)
+3. `scripts/compile_protos.sh` (writes `bb_robotx_dashboard/proto/*_pb2.py`)
 
 ## Environment (`.bashrc`)
 
@@ -52,7 +44,7 @@ wrapped in `|| true`):
 
 | Variable | Value | Purpose |
 |---|---|---|
-| `GZ_SIM_RESOURCE_PATH` | `…:~/PX4-Autopilot/Tools/simulation/gz/models` | Allows Gazebo to resolve `model://uav2_description/meshes/…` URIs from the UAV model SDF. `uav2_description` is in `uav_ws`, which is not sourced globally. |
+| `GZ_SIM_RESOURCE_PATH` | `…:~/PX4-Autopilot/Tools/simulation/gz/models` | Allows Gazebo to resolve `model://uav_description/meshes/…` URIs from the UAV model SDF. `uav_description` is in `uav_ws`, which is not sourced globally. |
 | `ROBOCOMMAND_HOST` | `localhost` | Host of the RoboCommand TCP server that `bb_robotx_dashboard` connects to. Override per-pane to target a real vehicle. |
 | `ROBOCOMMAND_PORT` | `9000` | RoboCommand TCP port. |
 | `ROBOCOMMAND_TEAM_ID` | `42` | Team identifier sent on the RoboCommand handshake. |

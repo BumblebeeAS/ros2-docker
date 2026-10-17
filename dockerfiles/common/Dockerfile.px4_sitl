@@ -6,12 +6,15 @@ ARG PX4_VERSION=v1.16.0
 ARG ROS_DISTRO=jazzy
 
 # kconfiglib pip install fails in Dockerfile context; must use apt
-# ros-gz-bridge enables ROS <-> Gazebo Harmonic transport
+# Gazebo vendor headers and OpenCV are needed to build PX4 simulation modules.
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y \
     curl \
     python3-kconfiglib \
+    libopencv-dev \
+    ros-${ROS_DISTRO}-ros-gz-sim \
+    ros-${ROS_DISTRO}-gz-plugin-vendor \
     ros-${ROS_DISTRO}-ros-gz-bridge \
     patch
 
@@ -75,7 +78,10 @@ PATCH
 
 ./Tools/setup/ubuntu.sh --no-nuttx --no-sim-tools
 
+# Expose Gazebo vendor packages so PX4 builds its gz_bridge module.
+. /opt/ros/${ROS_DISTRO}/setup.sh
 make -j$(nproc) px4_sitl_default
+test -e build/px4_sitl_default/bin/px4-gz_bridge
 
 cd ${HOME_DIR}
 mkdir -p px4_sitl/romfs/etc
