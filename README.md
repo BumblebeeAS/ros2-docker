@@ -46,7 +46,7 @@ Tip: start from the nearest environment and tune `rosdep-apt.list`, `rosdep-pip.
 
 The `uav` environment uses GSCam with Isaac ROS 5.0 / ROS 2 Lyrical for the two IMX219 cameras. Each camera and its processing nodes run in a separate component container.
 
-The image also installs the [UAV camera color and edge-shading calibration](environments/uav/README.md), including its GStreamer filter dependencies. Calibration lives in `environments/uav/camera_color.yaml` and is read from `/etc/ros/uav/camera_color.yaml` by the camera launch.
+See [UAV camera calibration](environments/uav/README.md) for configuration and setup.
 
 UAV sets `CONFIG_ROS_DOMAIN_ID=38` in its `.ros_docker-config`, matching PX4 `UXRCE_DDS_DOM_ID`. This setting takes precedence over the host `ROS_DOMAIN_ID` and applies to all container processes. Environments without it inherit the host domain, defaulting to 0.
 
