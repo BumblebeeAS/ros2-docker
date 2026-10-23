@@ -3,6 +3,9 @@ libboost-all-dev
 libyaml-cpp-dev
 libnlopt-dev
 libnlopt-cxx-dev
+libnvinfer-dev
+libnvinfer-plugin-dev
+libnvonnxparsers-dev
 lm-sensors
 ros-jazzy-ament-clang-format
 ros-jazzy-foxglove-compressed-video-transport
