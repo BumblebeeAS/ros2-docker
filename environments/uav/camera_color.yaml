@@ -1,0 +1,21 @@
+# IMX219 neutral-paper calibration, 2026-10-23, stock L4T R39.2.1 NITO.
+#
+# We tried the ISP file from:
+# https://files.seeedstudio.com/Driver/Camera_overrides.tar.gz
+# Its older settings were partly rejected by L4T R39.2.1, and Argus still
+# used imx219.nito for lens shading. The pink tint remained, so we disabled
+# the override and used the stock profile with the corrections below.
+#
+# RGB multipliers apply first, followed by the spatial shading correction.
+# Spatial terms: 1, x, y, x*x, x*y, y*y, (x*x+y*y)**2.
+# Coordinates run -1..1 from the top-left of the pre-rectification image.
+# Recalibrate after changing the lens, sensor mode, or lighting.
+color_balance_rgb:
+  narrow_a: [0.7625, 1.1304, 0.8127]
+  wide_a: [0.837, 1.0832, 0.8418]
+color_shading:
+  wide_a:
+    red: [-0.020413468, -0.003816322, 0.079110771, 0.428323811, 0.029095113, 0.225118306,
+      -0.086371011]
+    blue: [-0.023472631, 0.011327683, 0.028541501, 0.254628403, 0.034784022, 0.108686731,
+      -0.053454683]
