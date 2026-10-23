@@ -1,6 +1,0 @@
-ARG BASE_IMAGE
-FROM $BASE_IMAGE
-
-# Camera calibration belongs to this hardware environment, not the ROS workspace.
-COPY environments/uav/camera_color.yaml /etc/ros/uav/camera_color.yaml
-ENV UAV_CAMERA_COLOR_CONFIG=/etc/ros/uav/camera_color.yaml
