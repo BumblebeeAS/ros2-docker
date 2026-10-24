@@ -14,10 +14,7 @@ fi
 
 export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH:$HOME/PX4-Autopilot/Tools/simulation/gz/models
 
-# bb_robotx_dashboard runtime env. Baked into ~/.bashrc at image build time
-# (Dockerfile.install_env appends this file), so every interactive shell —
-# including tmux panes — picks them up. Rotate DASHBOARD_ADMIN_SECRET before
-# exposing the dashboard beyond localhost; changes require an image rebuild.
+# Dashboard connection and server defaults.
 export ROBOCOMMAND_HOST=localhost
 export ROBOCOMMAND_PORT=9000
 export ROBOCOMMAND_TEAM_ID=42

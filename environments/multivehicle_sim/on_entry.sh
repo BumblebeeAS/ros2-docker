@@ -16,12 +16,14 @@ PX4_AIRFRAMES_DIR=${PX4_SITL_DIR}/romfs/etc/init.d-posix/airframes
 UAV_DESC_URDF_DIR=${UAV_WS_DIR}/install/uav_description/share/uav_description/urdf
 ETC_DIR=${BRINGUP_DIR}/etc/uav_sim
 
-source "${UAV_WS_DIR}/install/local_setup.bash"
-mkdir -p "${PX4_MODEL_DIR}" "${PX4_AIRFRAMES_DIR}"
-gz sdf -p "${UAV_DESC_URDF_DIR}/uav.urdf" > "${PX4_MODEL_DIR}/model.sdf"
-# Replace old links before copying so existing targets are not overwritten.
-cp --remove-destination "${ETC_DIR}/model.config" "${PX4_MODEL_DIR}/model.config"
-cp --remove-destination "${ETC_DIR}/5000_gz_uav" "${PX4_AIRFRAMES_DIR}/5000_gz_uav"
+if [ -f "${UAV_WS_DIR}/install/local_setup.bash" ]; then
+    source "${UAV_WS_DIR}/install/local_setup.bash"
+    mkdir -p "${PX4_MODEL_DIR}" "${PX4_AIRFRAMES_DIR}"
+    gz sdf -p "${UAV_DESC_URDF_DIR}/uav.urdf" > "${PX4_MODEL_DIR}/model.sdf"
+    # Replace old links before copying so existing targets are not overwritten.
+    cp --remove-destination "${ETC_DIR}/model.config" "${PX4_MODEL_DIR}/model.config"
+    cp --remove-destination "${ETC_DIR}/5000_gz_uav" "${PX4_AIRFRAMES_DIR}/5000_gz_uav"
+fi
 
 # bb_robotx_dashboard proto bootstrap (README §Setup). Each step idempotent;
 # `|| true` so a missing network / unzip doesn't halt the entrypoint. The
