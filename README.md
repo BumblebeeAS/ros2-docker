@@ -40,6 +40,7 @@ We deploy on three types of vehicles:
 | `auv_sim`   | AUV simulation with [DAVE Sim](https://field-robotics-lab.github.io/dave.doc/) + Gazebo |                                                                        |
 | `uav`      | UAV software stack on Jetson                                                            | PX4 DDS bridge support via Micro XRCE-DDS Agent, Argus camera support  |
 | `uav_sim`  | UAV simulation with PX4 + Gazebo                                                        | PX4 Autopilot SITL + Gazebo, MAVSDK tooling                            |
+| `multivehicle_sim` | Multi-vehicle simulation with DAVE + Gazebo | Standalone PX4 SITL, Micro XRCE-DDS Agent, all vehicle workspaces mounted |
 | `bluerov_ws` | BlueROV simulation demos from [BumblebeeAS/examples](https://github.com/BumblebeeAS/examples) | Standard ROS Jazzy image, ArduSub/Gazebo base, CUDA perception stack  |
 
 Tip: start from the nearest environment and tune `rosdep-apt.list`, `rosdep-pip.list`, and `CONFIG_IMAGE_KEY` for your project.
@@ -53,8 +54,8 @@ UAV sets `CONFIG_ROS_DOMAIN_ID=38` in its `.ros_docker-config`, matching PX4 `UX
 
 We tested this repository on these configurations:
 
-| Scenario                       | Sample hardware                                          | Sample OS / platform           | Environments          |
-| ------------------------------ | -------------------------------------------------------- | ------------------------------ | --------------------- |
+| Scenario                       | Sample hardware                                          | Sample OS / platform           | Environments         |
+| ------------------------------ | -------------------------------------------------------- | ------------------------------ | -------------------- |
 | Jetson development (`aarch64`) | Jetson Orin NX, AGX Orin or AGX Thor, 40 GB+ free disk   | JetPack 7 (Ubuntu 24.04 based) | `asv`, `auv`, `uav`  |
 | Workstation (`x86_64`)         | 8+ CPU cores, 16-32 GB RAM, NVIDIA GPU, 50 GB+ free disk | Ubuntu 24.04 LTS               | `auv_sim`, `uav_sim` |
 
