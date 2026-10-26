@@ -1,3 +1,0 @@
-# Source: NVIDIA support, IMX219 on JetPack 7.2
-# https://forums.developer.nvidia.com/t/noisy-camera-imx219/373233/6
-demosaic.v6.enableDmx = true;
