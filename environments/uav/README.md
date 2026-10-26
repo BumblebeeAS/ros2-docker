@@ -1,3 +1,9 @@
-# UAV camera calibration
+# UAV camera setup
 
-Camera calibration lives in [vision_pipeline](https://github.com/BumblebeeAS/vision_pipeline/tree/main/config/uav). Edit `camera_color.yaml` there, rebuild the package, and restart the camera launch.
+Install the IMX219 ISP override on the Jetson host, from this repository root:
+
+```bash
+bash environments/uav/install-camera-isp.sh
+```
+
+Reboot to apply it. The installer backs up any existing override. Leave software color correction disabled until it is recalibrated with this ISP setting.
