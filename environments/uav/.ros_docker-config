@@ -11,8 +11,15 @@ BUILT_IMAGE=isaac-ros-uav:latest
 # Must match the flight controller uXRCE-DDS domain (UXRCE_DDS_DOM_ID).
 CONFIG_ROS_DOMAIN_ID=38
 
-# Note that env variables like $HOME cannot be unpacked here
+# Use onboard discovery by default; the bridge selects its ASV input profile.
+ISAAC_ROS_DOCKER_ARGS+=(
+    -e "RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}"
+    -e "FASTDDS_DEFAULT_PROFILES_FILE=${FASTDDS_DEFAULT_PROFILES_FILE:-/etc/ros/dds/fastdds_local.xml}"
+)
+
+# Workspace, profile, and cache mounts.
 MOUNT_DIRS=(
+    "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/dds:/etc/ros/dds:ro"
     "$HOME/workspaces/isaac_ros-dev:/workspaces/isaac_ros-dev"
     "$HOME/.cache/ccache:/home/admin/.cache/ccache"
     "$HOME/.cache/torch:/home/admin/.cache/torch"

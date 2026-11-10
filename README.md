@@ -49,6 +49,12 @@ The `uav` environment uses GSCam with Isaac ROS 5.0 / ROS 2 Lyrical for the two 
 UAV sets `CONFIG_ROS_DOMAIN_ID=38` in its `.ros_docker-config`, matching PX4 `UXRCE_DDS_DOM_ID`. This setting takes precedence over the host `ROS_DOMAIN_ID` and applies to all container processes. Environments without it inherit the host domain, defaulting to 0.
 
 
+### UAV DDS defaults
+
+The UAV `.ros_docker-config` sets domain 38, `rmw_fastrtps_cpp`, and `/etc/ros/dds/fastdds_local.xml`. All container processes inherit these values. Set `RMW_IMPLEMENTATION` or `FASTDDS_DEFAULT_PROFILES_FILE` before `ros2-docker up` to override them.
+
+Profiles live in `environments/uav/dds`, mounted read-only at `/etc/ros/dds`. The local profile keeps discovery onboard. The UAV bridge discovers the ASV using `asv_input_fastdds.xml`. [Bring-up](https://github.com/BumblebeeAS/bring-up/pull/28) configures its allowed topics and startup. AUV profiles stay in bring-up while its Docker tooling is older.
+
 ## Sample Hardware and OS Requirements
 
 We tested this repository on these configurations:
