@@ -4,7 +4,7 @@
       <transport_descriptor>
         <transport_id>uav_asv_bridge_udp</transport_id>
         <type>UDPv4</type>
-        <!-- Only this bridge probes remote ASV participant ports. -->
+        <!-- Allow discovery of ASV participants. -->
         <maxInitialPeersRange>120</maxInitialPeersRange>
       </transport_descriptor>
       <transport_descriptor>

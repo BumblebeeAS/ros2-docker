@@ -51,33 +51,11 @@ UAV sets `CONFIG_ROS_DOMAIN_ID=38` in its `.ros_docker-config`, matching PX4 `UX
 
 ### UAV DDS defaults
 
-`environments/uav/.ros_docker-config` supplies domain 38, `rmw_fastrtps_cpp`,
-and the local discovery profile when creating the container. All container
-processes, including `docker exec` shells, inherit these values. Set
-`RMW_IMPLEMENTATION` or
-`FASTDDS_DEFAULT_PROFILES_FILE` before `ros2-docker up` for an explicit override.
-The UAV domain is controlled by `CONFIG_ROS_DOMAIN_ID` in its environment config.
+The UAV `.ros_docker-config` sets domain 38, `rmw_fastrtps_cpp`, and `/etc/ros/dds/fastdds_local.xml`. All container processes inherit these values. Set `RMW_IMPLEMENTATION` or `FASTDDS_DEFAULT_PROFILES_FILE` before `ros2-docker up` to override them.
 
-Profiles live in `environments/uav/dds`, which the UAV environment mounts
-read-only at `/etc/ros/dds`. Its default is `/etc/ros/dds/fastdds_local.xml`;
-ordinary participants discover only loopback peers and use shared memory.
-The configurable ASV-to-UAV bridge in bring-up selects
-`/etc/ros/dds/asv_input_fastdds.xml` for its input process. Update the
-[bring-up bridge configuration](https://github.com/BumblebeeAS/bring-up/pull/28)
-alongside this environment. The YAML topic/type/QoS whitelist stays in bring-up.
-No startup script edits Docker config or container shell files.
+Profiles live in `environments/uav/dds`, mounted read-only at `/etc/ros/dds`. The local profile keeps discovery onboard. The ASV bridge uses `asv_input_fastdds.xml`; its topic whitelist and startup are managed by [bring-up](https://github.com/BumblebeeAS/bring-up/pull/28). AUV profiles stay in bring-up while its Docker tooling is older.
 
-AUV profiles remain in bring-up while its deployed Docker tooling is older;
-this UAV change does not require upgrading the AUV Docker checkout.
-
-Recreate existing containers to apply runtime environment changes; restarting
-one keeps its previous environment. These runtime defaults do not require an
-image rebuild. For hosts previously configured with the provisioning script,
-remove its `# BEGIN bring-up Fast DDS` through `# END bring-up Fast DDS` blocks
-from the UAV `.ros_docker-config` and `.bashrc` before updating those files.
-Remove any older explicit camera-profile exports as well. Existing containers
-may still contain those baked-in shell settings, so use a rebuilt image for
-that migration.
+Recreate the container to apply the environment and mount changes. No image rebuild is needed unless the image contains old shell overrides. For installations that used the provisioning script, remove the `# BEGIN bring-up Fast DDS` through `# END bring-up Fast DDS` blocks from the UAV `.ros_docker-config` and `.bashrc`, along with any old camera-profile exports. Rebuild the image if those overrides were baked into it.
 
 ## Sample Hardware and OS Requirements
 

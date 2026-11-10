@@ -11,14 +11,13 @@ BUILT_IMAGE=isaac-ros-uav:latest
 # Must match the flight controller uXRCE-DDS domain (UXRCE_DDS_DOM_ID).
 CONFIG_ROS_DOMAIN_ID=38
 
-# Ordinary UAV DDS participants stay onboard. The cross-domain bridge selects
-# its ASV input profile separately from the read-only DDS directory below.
+# Use onboard discovery by default; the bridge selects its ASV input profile.
 ISAAC_ROS_DOCKER_ARGS+=(
     -e "RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}"
     -e "FASTDDS_DEFAULT_PROFILES_FILE=${FASTDDS_DEFAULT_PROFILES_FILE:-/etc/ros/dds/fastdds_local.xml}"
 )
 
-# Note that env variables like $HOME cannot be unpacked here
+# Workspace, profile, and cache mounts.
 MOUNT_DIRS=(
     "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/dds:/etc/ros/dds:ro"
     "$HOME/workspaces/isaac_ros-dev:/workspaces/isaac_ros-dev"

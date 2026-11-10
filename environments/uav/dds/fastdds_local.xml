@@ -4,11 +4,10 @@
       <transport_descriptor>
         <transport_id>uav_udp</transport_id>
         <type>UDPv4</type>
-        <!-- Ordinary UAV participants discover only onboard processes. -->
+        <!-- Limit UDP to loopback. -->
         <interfaceWhiteList>
           <address>127.0.0.1</address>
         </interfaceWhiteList>
-        <!-- Keep room for the onboard participants; probes stay on loopback. -->
         <maxInitialPeersRange>120</maxInitialPeersRange>
       </transport_descriptor>
       <transport_descriptor>
@@ -22,7 +21,7 @@
           <initialPeersList>
             <locator><udpv4><address>127.0.0.1</address></udpv4></locator>
           </initialPeersList>
-          <!-- Disable multicast discovery; the UDP transport permits loopback only. -->
+          <!-- Disable multicast discovery. -->
           <metatrafficUnicastLocatorList>
             <locator><udpv4><address>0.0.0.0</address></udpv4></locator>
           </metatrafficUnicastLocatorList>
@@ -34,7 +33,7 @@
         </userTransports>
       </rtps>
     </participant>
-    <!-- Component load replies can exceed the default 100 ms during GPU startup. -->
+    <!-- Allow slow camera component replies during GPU startup. -->
     <publisher profile_name="service">
       <qos>
         <reliability>
