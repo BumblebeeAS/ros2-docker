@@ -12,14 +12,15 @@ BUILT_IMAGE=isaac-ros-uav:latest
 CONFIG_ROS_DOMAIN_ID=38
 
 # Ordinary UAV DDS participants stay onboard. The cross-domain bridge selects
-# its ASV input profile separately; profile files come from mounted bring-up.
+# its ASV input profile separately from the read-only DDS directory below.
 ISAAC_ROS_DOCKER_ARGS+=(
     -e "RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}"
-    -e "FASTDDS_DEFAULT_PROFILES_FILE=${FASTDDS_DEFAULT_PROFILES_FILE:-/workspaces/isaac_ros-dev/src/bring-up/etc/uav/fastdds_local.xml}"
+    -e "FASTDDS_DEFAULT_PROFILES_FILE=${FASTDDS_DEFAULT_PROFILES_FILE:-/etc/ros/dds/fastdds_local.xml}"
 )
 
 # Note that env variables like $HOME cannot be unpacked here
 MOUNT_DIRS=(
+    "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/dds:/etc/ros/dds:ro"
     "$HOME/workspaces/isaac_ros-dev:/workspaces/isaac_ros-dev"
     "$HOME/.cache/ccache:/home/admin/.cache/ccache"
     "$HOME/.cache/torch:/home/admin/.cache/torch"

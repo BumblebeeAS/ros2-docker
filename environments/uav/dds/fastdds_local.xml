@@ -1,0 +1,48 @@
+<dds xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+  <profiles>
+    <transport_descriptors>
+      <transport_descriptor>
+        <transport_id>uav_udp</transport_id>
+        <type>UDPv4</type>
+        <!-- Ordinary UAV participants discover only onboard processes. -->
+        <interfaceWhiteList>
+          <address>127.0.0.1</address>
+        </interfaceWhiteList>
+        <!-- Keep room for the onboard participants; probes stay on loopback. -->
+        <maxInitialPeersRange>120</maxInitialPeersRange>
+      </transport_descriptor>
+      <transport_descriptor>
+        <transport_id>uav_shm</transport_id>
+        <type>SHM</type>
+      </transport_descriptor>
+    </transport_descriptors>
+    <participant profile_name="uav_local" is_default_profile="true">
+      <rtps>
+        <builtin>
+          <initialPeersList>
+            <locator><udpv4><address>127.0.0.1</address></udpv4></locator>
+          </initialPeersList>
+          <!-- Disable multicast discovery; the UDP transport permits loopback only. -->
+          <metatrafficUnicastLocatorList>
+            <locator><udpv4><address>0.0.0.0</address></udpv4></locator>
+          </metatrafficUnicastLocatorList>
+        </builtin>
+        <useBuiltinTransports>false</useBuiltinTransports>
+        <userTransports>
+          <transport_id>uav_udp</transport_id>
+          <transport_id>uav_shm</transport_id>
+        </userTransports>
+      </rtps>
+    </participant>
+    <!-- Component load replies can exceed the default 100 ms during GPU startup. -->
+    <publisher profile_name="service">
+      <qos>
+        <reliability>
+          <max_blocking_time>
+            <sec>10</sec>
+          </max_blocking_time>
+        </reliability>
+      </qos>
+    </publisher>
+  </profiles>
+</dds>
