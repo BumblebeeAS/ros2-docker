@@ -1,0 +1,12 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    build-essential cmake git libasio-dev libssl-dev libtinyxml2-dev \
+    libyaml-cpp-dev nlohmann-json3-dev
+
+COPY dockerfiles/common/install_ddsrouter.sh /tmp/install_ddsrouter.sh
+RUN bash /tmp/install_ddsrouter.sh \
+    && rm -rf /tmp/ddsrouter-build /tmp/install_ddsrouter.sh
