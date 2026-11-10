@@ -55,7 +55,14 @@ The UAV `.ros_docker-config` sets domain 38, `rmw_fastrtps_cpp`, and `/etc/ros/d
 
 Profiles live in `environments/uav/dds`, mounted read-only at `/etc/ros/dds`. The local profile keeps discovery onboard. The UAV bridge discovers the ASV using `asv_input_fastdds.xml`. [Bring-up](https://github.com/BumblebeeAS/bring-up/pull/28) configures its allowed topics and startup. AUV profiles stay in bring-up while its Docker tooling is older.
 
-Recreate the container to apply the environment and mount changes. No image rebuild is needed unless the image contains old shell overrides. For installations that used the provisioning script, remove the `# BEGIN bring-up Fast DDS` through `# END bring-up Fast DDS` blocks from the UAV `.ros_docker-config` and `.bashrc`, along with any old camera-profile exports. Rebuild the image if those overrides were baked into it.
+After updating both repositories, rebuild the UAV image and recreate the container:
+
+```bash
+ros2-docker use uav
+ros2-docker down
+ros2-docker build
+ros2-docker up
+```
 
 ## Sample Hardware and OS Requirements
 
