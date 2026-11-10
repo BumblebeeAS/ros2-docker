@@ -16,6 +16,7 @@
       </transport_descriptor>
     </transport_descriptors>
     <participant profile_name="uav_local" is_default_profile="true">
+      <domainId>38</domainId>
       <rtps>
         <builtin>
           <initialPeersList>
