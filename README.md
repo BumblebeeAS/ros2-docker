@@ -49,6 +49,31 @@ The `uav` environment uses GSCam with Isaac ROS 5.0 / ROS 2 Lyrical for the two 
 UAV sets `CONFIG_ROS_DOMAIN_ID=38` in its `.ros_docker-config`, matching PX4 `UXRCE_DDS_DOM_ID`. This setting takes precedence over the host `ROS_DOMAIN_ID` and applies to all container processes. Environments without it inherit the host domain, defaulting to 0.
 
 
+### UAV DDS defaults
+
+`environments/uav/.ros_docker-config` supplies domain 38, `rmw_fastrtps_cpp`,
+and the local discovery profile when creating the container. The UAV `.bashrc`
+provides matching middleware/profile defaults for shells and preserves values
+already supplied by the runtime. Set `RMW_IMPLEMENTATION` or
+`FASTDDS_DEFAULT_PROFILES_FILE` before `ros2-docker up` for an explicit override.
+The UAV domain is controlled by `CONFIG_ROS_DOMAIN_ID` in its environment config.
+
+The profile lives in the mounted workspace at
+`src/bring-up/etc/uav/fastdds_local.xml`; update the [bring-up checkout](https://github.com/BumblebeeAS/bring-up/pull/28)
+before creating the container. Ordinary participants discover only loopback
+peers and use shared memory. The configurable ASV-to-UAV bridge in bring-up
+selects a separate ASV input profile. No startup script edits Docker config
+or container shell files.
+
+Recreate existing containers to apply runtime environment changes; restarting
+one keeps its previous environment. Rebuild the image to refresh its shell
+configuration. For hosts previously configured with the provisioning script,
+remove its `# BEGIN bring-up Fast DDS` through `# END bring-up Fast DDS` blocks
+from the UAV `.ros_docker-config` and `.bashrc` before updating those files.
+Remove any older explicit camera-profile exports as well. Existing containers
+may still contain those baked-in shell settings, so use a rebuilt image for
+that migration.
+
 ## Sample Hardware and OS Requirements
 
 We tested this repository on these configurations:
