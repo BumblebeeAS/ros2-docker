@@ -50,7 +50,7 @@ The `uav` environment uses GSCam with Isaac ROS 5.0 / ROS 2 Lyrical for the two 
 
 The UAV environment sets domain 38 (matching PX4), `rmw_fastrtps_cpp`, and onboard-only discovery through `/etc/ros/dds/fastdds_local.xml`. These settings apply to every container process. Set `RMW_IMPLEMENTATION` or `FASTDDS_DEFAULT_PROFILES_FILE` before `ros2-docker up` to override them; `CONFIG_ROS_DOMAIN_ID` takes precedence over the host domain.
 
-Profiles in `environments/uav/dds` are mounted read-only at `/etc/ros/dds`. DDS Router 3.5.4 and its private libraries live under `/opt/ddsrouter`. Its named participants use ASV domain 2 and UAV domain 38; [bring-up](https://github.com/BumblebeeAS/bring-up/pull/28) owns the topic policy and startup.
+Profiles in `environments/uav/dds` are mounted read-only at `/etc/ros/dds`. DDS Router 3.5.1 and its private libraries are copied from a pinned official Vulcanexus image into `/opt/ddsrouter`; no source compilation is needed. Its named participants use ASV domain 2 and UAV domain 38; [bring-up](https://github.com/BumblebeeAS/bring-up/pull/28) owns the topic policy and startup.
 
 ## Sample Hardware and OS Requirements
 
