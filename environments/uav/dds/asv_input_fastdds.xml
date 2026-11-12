@@ -15,15 +15,14 @@
     <participant profile_name="uav_asv_input" is_default_profile="true">
       <domainId>2</domainId>
       <rtps>
-        <!-- Port 7910: ASV5 peers the router there explicitly. -->
-        <participantID>0</participantID>
         <builtin>
           <initialPeersList>
             <locator><udpv4><address>127.0.0.1</address></udpv4></locator>
             <locator><udpv4><address>192.168.11.50</address></udpv4></locator>
           </initialPeersList>
           <metatrafficUnicastLocatorList>
-            <locator><udpv4><address>0.0.0.0</address></udpv4></locator>
+            <!-- Keep ASV discovery on 7910 without reserving a host-wide participant ID. -->
+            <locator><udpv4><address>0.0.0.0</address><port>7910</port></udpv4></locator>
           </metatrafficUnicastLocatorList>
         </builtin>
         <useBuiltinTransports>false</useBuiltinTransports>
