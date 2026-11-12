@@ -1,8 +1,15 @@
 imutils
+pupil-apriltags==1.0.4.post11
 kornia
 lap
 opencv-contrib-python<4.12
+onnx-graphsurgeon
+onnxsim
+onnxscript
+cuda-bindings
+polygraphy
 pygeodesy
-supervision
+rfdetr==1.11.2
+supervision>=0.29,<0.31
 typer
 scikit-learn>=1.3
