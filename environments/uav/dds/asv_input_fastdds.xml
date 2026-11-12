@@ -15,6 +15,13 @@
     <participant profile_name="uav_asv_input" is_default_profile="true">
       <domainId>2</domainId>
       <rtps>
+        <!-- Pinned so the router's domain-2 discovery port is always 7910
+             (7400 + 250*2 + 10). The ASV5 profile (bring-up
+             etc/asv5_orin/fastdds_unicast.xml) peers 192.168.16.50:7910 with an
+             explicit port instead of probing 120 ports over the Microhard.
+             If another domain-2 participant already holds ID 0 on the UAV,
+             the router fails to start instead of silently moving ports. -->
+        <participantID>0</participantID>
         <builtin>
           <initialPeersList>
             <locator><udpv4><address>127.0.0.1</address></udpv4></locator>
