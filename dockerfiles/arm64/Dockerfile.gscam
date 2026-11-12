@@ -9,4 +9,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
     ros-${ROS_DISTRO}-gscam \
     ros-${ROS_DISTRO}-isaac-ros-image-proc \
+    ros-${ROS_DISTRO}-isaac-ros-h264-encoder \
+    ros-${ROS_DISTRO}-topic-tools \
     ros-${ROS_DISTRO}-compressed-image-transport
