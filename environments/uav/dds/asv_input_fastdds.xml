@@ -15,6 +15,8 @@
     <participant profile_name="uav_asv_input" is_default_profile="true">
       <domainId>2</domainId>
       <rtps>
+        <!-- Port 7910: ASV5 peers the router there explicitly. -->
+        <participantID>0</participantID>
         <builtin>
           <initialPeersList>
             <locator><udpv4><address>127.0.0.1</address></udpv4></locator>
