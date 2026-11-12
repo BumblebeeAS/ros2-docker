@@ -11,10 +11,13 @@ BUILT_IMAGE=isaac-ros-uav:latest
 # Must match the flight controller uXRCE-DDS domain (UXRCE_DDS_DOM_ID).
 CONFIG_ROS_DOMAIN_ID=38
 
-# Use onboard discovery by default; the bridge selects its ASV input profile.
+# Use one profile for Fast DDS 2.x and 3.x. The newer variable wins if both are set.
+UAV_DDS_PROFILE=${FASTDDS_DEFAULT_PROFILES_FILE:-${FASTRTPS_DEFAULT_PROFILES_FILE:-/etc/ros/dds/fastdds_local.xml}}
+# The bridge selects its ASV input profile explicitly.
 ISAAC_ROS_DOCKER_ARGS+=(
     -e "RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}"
-    -e "FASTDDS_DEFAULT_PROFILES_FILE=${FASTDDS_DEFAULT_PROFILES_FILE:-/etc/ros/dds/fastdds_local.xml}"
+    -e "FASTDDS_DEFAULT_PROFILES_FILE=$UAV_DDS_PROFILE"
+    -e "FASTRTPS_DEFAULT_PROFILES_FILE=$UAV_DDS_PROFILE"
 )
 
 # Workspace, profile, and cache mounts.

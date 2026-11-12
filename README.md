@@ -48,7 +48,9 @@ The `uav` environment uses GSCam with Isaac ROS 5.0 / ROS 2 Lyrical for the two 
 
 ### UAV DDS
 
-The UAV environment sets domain 38 (matching PX4), `rmw_fastrtps_cpp`, and onboard-only discovery through `/etc/ros/dds/fastdds_local.xml`. These settings apply to every container process. Set `RMW_IMPLEMENTATION` or `FASTDDS_DEFAULT_PROFILES_FILE` before `ros2-docker up` to override them; `CONFIG_ROS_DOMAIN_ID` takes precedence over the host domain.
+The UAV environment sets domain 38 (matching PX4), `rmw_fastrtps_cpp`, and onboard-only discovery through `/etc/ros/dds/fastdds_local.xml`. These settings apply to every container process. Both `FASTDDS_DEFAULT_PROFILES_FILE` (Fast DDS 3.x) and `FASTRTPS_DEFAULT_PROFILES_FILE` (2.x) point to the same file. Set `RMW_IMPLEMENTATION` or either profile variable before `ros2-docker up` to override them; the newer profile variable wins if both are set, and `CONFIG_ROS_DOMAIN_ID` takes precedence over the host domain.
+
+Recreate an existing UAV container with `ros2-docker down` and `ros2-docker up` to apply environment changes; no image rebuild is needed. ASV5/AUV5 defaults continue to be installed by bring-up's `configure_fastdds.py`, including for older Docker checkouts.
 
 Profiles in `environments/uav/dds` are mounted read-only at `/etc/ros/dds`. DDS Router 3.5.4 and its private libraries live under `/opt/ddsrouter`. Its named participants use ASV domain 2 and UAV domain 38; [bring-up](https://github.com/BumblebeeAS/bring-up/pull/28) owns the topic policy and startup.
 
