@@ -63,20 +63,6 @@ RUN cat /tmp/.bashrc >> /home/${USERNAME}/.bashrc \
     && cat /tmp/.bashrc >> /root/.bashrc \
     && rm /tmp/.bashrc
 
-# NVIDIA's UID remapping must retain the shell files installed above and
-# later user edits. Populate only missing files from /etc/skel.
-RUN python3 - <<'PYTHON'
-from pathlib import Path
-entrypoint = Path("/usr/local/bin/scripts/workspace-entrypoint.sh")
-if entrypoint.exists():
-    text = entrypoint.read_text()
-    old = '  cp /etc/skel/.[^.]* /home/"${USERNAME}"/'
-    new = '  cp --update=none /etc/skel/.[^.]* /home/"${USERNAME}"/'
-    if old not in text and new not in text:
-        raise RuntimeError("Review changed NVIDIA entrypoint shell initialization")
-    entrypoint.write_text(text.replace(old, new))
-PYTHON
-
 # Entrypoint scripts
 COPY ${LOCAL_ENV_FOLDER}/on_entry.sh /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
 RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/on_entry.user.sh
