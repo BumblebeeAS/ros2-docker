@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Runs when the Docker container is launched.
+# These commands cannot be in a Dockerfile because they require mounted directories.
+# This script requires the `uav_description` package to be built in /workspaces/uav_ws.
+
+set -e
+
+PX4_AUTOPILOT_DIR=$HOME/PX4-Autopilot
+PX4_SITL_DIR=$HOME/px4_sitl
+UAV_WS_DIR=/workspaces/uav_ws
+BRINGUP_DIR=/workspaces/isaac_ros-dev/src/bring-up
+PX4_AUTOPILOT_GZ_DIR=${PX4_AUTOPILOT_DIR}/Tools/simulation/gz
+PX4_MODEL_DIR=${PX4_AUTOPILOT_GZ_DIR}/models/uav
+PX4_AIRFRAMES_DIR=${PX4_SITL_DIR}/romfs/etc/init.d-posix/airframes
+UAV_DESC_URDF_DIR=${UAV_WS_DIR}/install/uav_description/share/uav_description/urdf
+ETC_DIR=${BRINGUP_DIR}/etc/uav_sim
+
+if [ -f "${UAV_WS_DIR}/install/local_setup.bash" ]; then
+    source "${UAV_WS_DIR}/install/local_setup.bash"
+    mkdir -p "${PX4_MODEL_DIR}" "${PX4_AIRFRAMES_DIR}"
+    gz sdf -p "${UAV_DESC_URDF_DIR}/uav.urdf" > "${PX4_MODEL_DIR}/model.sdf"
+    # Replace old links before copying so existing targets are not overwritten.
+    cp --remove-destination "${ETC_DIR}/model.config" "${PX4_MODEL_DIR}/model.config"
+    cp --remove-destination "${ETC_DIR}/5000_gz_uav" "${PX4_AIRFRAMES_DIR}/5000_gz_uav"
+fi
+
+# bb_robotx_dashboard proto bootstrap (README §Setup). Each step idempotent;
+# `|| true` so a missing network / unzip doesn't halt the entrypoint. The
+# dashboard's runtime env vars (ROBOCOMMAND_*, DASHBOARD_*) live in
+# environments/multivehicle_sim/.bashrc so every tmux pane sees them.
+DASHBOARD_PKG_DIR=/workspaces/isaac_ros-dev/src/bb_robotx_dashboard
+if [ -d "${DASHBOARD_PKG_DIR}" ]; then
+    if [ ! -d "${DASHBOARD_PKG_DIR}/third_party/robocommand/proto" ]; then
+        git clone https://github.com/MonkeScripts/robocommand \
+            "${DASHBOARD_PKG_DIR}/third_party/robocommand" || true
+    fi
+    if [ ! -x "${DASHBOARD_PKG_DIR}/third_party/protoc/bin/protoc" ]; then
+        (cd "${DASHBOARD_PKG_DIR}" && bash scripts/fetch_protoc.sh) || true
+    fi
+    if [ -d "${DASHBOARD_PKG_DIR}/third_party/robocommand/proto" ] \
+            && [ ! -f "${DASHBOARD_PKG_DIR}/bb_robotx_dashboard/proto/report_pb2.py" ]; then
+        (cd "${DASHBOARD_PKG_DIR}" && bash scripts/compile_protos.sh) || true
+    fi
+fi

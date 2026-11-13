@@ -13,3 +13,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && python3 -m venv --system-site-packages /opt/venv
 
 ENV PATH="/opt/venv/bin:${PATH}"
+
+# Install the CLI in the venv even when system colcon is already visible.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python3 -m pip install --ignore-installed --no-deps colcon-core

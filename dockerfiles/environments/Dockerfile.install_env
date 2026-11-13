@@ -2,6 +2,8 @@ ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
 ARG ROS_DISTRO
+ARG HOST_USER_UID=1000
+ARG HOST_USER_GID=1000
 
 # Apt packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -49,7 +51,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # Keep frequently edited shell and entrypoint files after dependency layers so
 # changing them does not reinstall apt or pip packages.
 # For bash login shells, ~/.profile -> ~/.bashrc -> ~/.bash_aliases.
-RUN mkdir -p /home/${USERNAME}
+RUN mkdir -p /home/${USERNAME}/.cache \
+    && chown ${HOST_USER_UID}:${HOST_USER_GID} /home/${USERNAME}/.cache
 # /etc/skel contains default config files for new users
 RUN cp /etc/skel/.profile /home/${USERNAME}/.profile \
     && cp /etc/skel/.bashrc /home/${USERNAME}/.bashrc

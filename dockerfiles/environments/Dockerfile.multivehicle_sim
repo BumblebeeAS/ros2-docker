@@ -1,0 +1,16 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+ENV LOCAL_ENV_FOLDER=environments/multivehicle_sim
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install \
+        'fastapi' \
+        'uvicorn[standard]' \
+        'pydantic-settings'
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get purge -y npm \
+      && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+      && apt-get install -y nodejs
